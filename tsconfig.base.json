@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "strict": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "composite": true,
+    "baseUrl": ".",
+    "paths": {
+      "@aaes-os/runledger": ["packages/runledger/src/index.ts"],
+      "@aaes-os/aaes-governance": ["packages/aaes-governance/src/index.ts"],
+      "@aaes-os/trace-bus": ["packages/trace-bus/src/index.ts"],
+      "@aaes-os/ucr-runtime": ["packages/ucr-runtime/src/index.ts"],
+      "@aaes-os/tri-core-protocol": ["packages/tri-core-protocol/src/index.ts"]
+    }
+  }
+}

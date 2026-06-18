@@ -1,0 +1,17 @@
+/** Fault codes aligned with Python `src/fault_journal.py`. */
+
+export const FAULT_CODE_INVARIANT_BREACH = 'INVARIANT_BREACH' as const;
+export const FAULT_CODE_BRIDGE_BINDING_MISMATCH = 'BRIDGE_BINDING_MISMATCH' as const;
+export const FAULT_CODE_AUTHORITY_MISMATCH = 'AUTHORITY_MISMATCH' as const;
+export const FAULT_CODE_SPAN_ORPHAN = 'SPAN_ORPHAN' as const;
+export const FAULT_CODE_RUNTIME_TIMEOUT = 'RUNTIME_TIMEOUT' as const;
+
+export const FAULT_CODES = [
+  FAULT_CODE_INVARIANT_BREACH,
+  FAULT_CODE_BRIDGE_BINDING_MISMATCH,
+  FAULT_CODE_AUTHORITY_MISMATCH,
+  FAULT_CODE_SPAN_ORPHAN,
+  FAULT_CODE_RUNTIME_TIMEOUT,
+] as const;
+
+export type FaultCode = (typeof FAULT_CODES)[number];
