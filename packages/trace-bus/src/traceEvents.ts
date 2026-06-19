@@ -9,7 +9,7 @@ export interface TraceFaultPayload {
   timestamp: string;
   faultCode: string;
   severity: string;
-  contextSnapshot?: Record<string, unknown>;
+  contextSnapshot?: unknown;
   recurrenceCount?: number;
 }
 
@@ -29,6 +29,12 @@ export interface TraceEventBase {
   timestamp: string;
   runId: RunId;
   spanId?: SpanId;
+  runtimeContext?: {
+    hashAlg?: string;
+    hLawSpine?: string;
+    hCorridors?: string;
+    hTrustRoot?: string;
+  };
 }
 
 export interface TraceSpanEvent extends TraceEventBase {

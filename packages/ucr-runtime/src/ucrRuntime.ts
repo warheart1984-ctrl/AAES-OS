@@ -6,9 +6,15 @@ import {
   initGovernanceGlobals,
   type FaultEvent,
   type FaultJournal,
+  type GovernanceTraceBus,
+  type GovernanceTraceEvent,
   type InvariantEngine,
 } from '@aaes-os/aaes-governance';
-import { applyDeployedOutputPatches } from '@aaes-os/tri-core-protocol';
+import {
+  applyDeployedOutputPatches,
+  getPatchLedger,
+  seedApprovedPatches,
+} from '@aaes-os/tri-core-protocol';
 import { TraceBus } from '@aaes-os/trace-bus';
 
 import { withSpanGuard } from './withSpanGuard.js';
@@ -37,6 +43,7 @@ export interface UCRRuntimeOptions {
   invariantEngine?: InvariantEngine;
   enablePatches?: boolean;
   demoSchedule?: DemoRunMode[];
+  outputMode?: DemoRunMode;
 }
 
 const SPAN_NAME = 'runtime-execution';
@@ -57,12 +64,15 @@ export class UCRRuntime {
     this.traceBus = options.traceBus ?? new TraceBus();
     const wired = createMinimalInvariantEngine(
       options.faultJournal ?? globalJournal,
-      this.traceBus,
+      asGovernanceTraceBus(this.traceBus),
     );
     this.faultJournal = wired.journal;
     this.invariantEngine = options.invariantEngine ?? wired.engine;
     this.enablePatches = options.enablePatches ?? false;
-    this.demoSchedule = options.demoSchedule ?? [];
+    if (this.enablePatches && !getPatchLedger()) {
+      seedApprovedPatches();
+    }
+    this.demoSchedule = options.demoSchedule ?? (options.outputMode ? [options.outputMode] : []);
   }
 
   getTraceBus(): TraceBus {
@@ -94,7 +104,11 @@ export class UCRRuntime {
     };
 
     if (this.enablePatches) {
-      await withSpanGuard(this.runStore, this.traceBus, run.runId, SPAN_NAME, execute);
+      try {
+        await withSpanGuard(this.runStore, this.traceBus, run.runId, SPAN_NAME, execute);
+      } catch (error) {
+        executionError = error instanceof Error ? error : new Error(String(error));
+      }
     } else {
       const span = this.runStore.startSpan(run.runId, { name: SPAN_NAME });
       this.traceBus.spanStart(run.runId, span.spanId, SPAN_NAME);
@@ -115,7 +129,6 @@ export class UCRRuntime {
             message: executionError.message,
           },
         });
-        throw executionError;
       }
     }
 
@@ -127,10 +140,6 @@ export class UCRRuntime {
     }
 
     this.traceBus.runEnd(run.runId);
-
-    if (executionError) {
-      throw executionError;
-    }
 
     return {
       runId: run.runId,
@@ -146,7 +155,7 @@ export class UCRRuntime {
 
     switch (mode) {
       case 'string':
-        return intent.payload ?? `bad-output-${runIndex}`;
+        return `bad-output-${runIndex}`;
       case 'random':
         return {
           echo: intent.payload,
@@ -170,3 +179,18 @@ export class UCRRuntime {
 
 /** Alias retained for integration tests and demos. */
 export const DefaultUCRRuntime = UCRRuntime;
+
+function asGovernanceTraceBus(traceBus: TraceBus): GovernanceTraceBus {
+  return {
+    emit(event: GovernanceTraceEvent): void {
+      traceBus.emit(event);
+    },
+    subscribe(listener: (event: GovernanceTraceEvent) => void): () => void {
+      return traceBus.subscribe((event) => {
+        if ((event.type === 'TRACE_INVARIANT' || event.type === 'TRACE_FAULT') && event.spanId) {
+          listener(event as GovernanceTraceEvent);
+        }
+      });
+    },
+  };
+}

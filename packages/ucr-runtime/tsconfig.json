@@ -9,6 +9,7 @@
   "references": [
     { "path": "../runledger" },
     { "path": "../trace-bus" },
-    { "path": "../aaes-governance" }
+    { "path": "../aaes-governance" },
+    { "path": "../tri-core-protocol" }
   ]
 }

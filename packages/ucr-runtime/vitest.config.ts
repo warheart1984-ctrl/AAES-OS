@@ -10,6 +10,7 @@ export default defineConfig({
       '@aaes-os/runledger': path.join(pkgDir, '../runledger/src/index.ts'),
       '@aaes-os/aaes-governance': path.join(pkgDir, '../aaes-governance/src/index.ts'),
       '@aaes-os/trace-bus': path.join(pkgDir, '../trace-bus/src/index.ts'),
+      '@aaes-os/tri-core-protocol': path.join(pkgDir, '../tri-core-protocol/src/index.ts'),
     },
   },
   test: {

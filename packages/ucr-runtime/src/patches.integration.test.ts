@@ -44,7 +44,7 @@ describe('governance patches integration', () => {
     expect(preShape).toBe(12);
     expect(postShape).toBe(0);
     expect(preDeterminism).toBe(8);
-    expect(postDeterminism).toBe(1);
+    expect(postDeterminism).toBe(0);
     expect(postDeterminism).toBeLessThan(preDeterminism);
     expect(postShape).toBeLessThan(preShape);
   });

@@ -71,6 +71,15 @@ export function countSpanBoundaryFaults(faults: FaultEvent[]): number {
     (fault) =>
       fault.faultCode === 'SPAN_ORPHAN' ||
       fault.faultCode === 'INV_FAIL_SPAN_BOUNDARY' ||
-      fault.contextSnapshot?.reason === 'span_orphan',
+      hasReason(fault.contextSnapshot, 'span_orphan'),
   ).length;
+}
+
+function hasReason(value: unknown, reason: string): boolean {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    'reason' in value &&
+    (value as { reason?: unknown }).reason === reason
+  );
 }

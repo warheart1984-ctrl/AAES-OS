@@ -5,5 +5,12 @@
     "outDir": "dist",
     "lib": ["ES2022"]
   },
-  "include": ["src/server.ts", "src/metrics.ts", "src/telemetryState.ts", "src/seedTelemetry.ts"]
+  "include": [
+    "src/server.ts",
+    "src/metrics.ts",
+    "src/telemetryState.ts",
+    "src/seedTelemetry.ts",
+    "src/mriState.ts",
+    "src/patchLedgerState.ts"
+  ]
 }

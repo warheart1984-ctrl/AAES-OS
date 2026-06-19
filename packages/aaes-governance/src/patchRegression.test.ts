@@ -71,7 +71,9 @@ describe('patch regression (constitutional patches)', () => {
       faultJournal: journal,
       invariantEngine: engine,
     });
-    await expect(before.run({ payload: {} })).rejects.toThrow('demo throw');
+    const beforeResult = await before.run({ payload: {} });
+    expect(beforeResult.status).toBe('failed');
+    expect(beforeResult.spanOrphan).toBe(true);
     expect(journal.getAll().some((f) => f.faultCode === FAULT_CODE_SPAN_ORPHAN)).toBe(true);
 
     journal.clear();
@@ -82,7 +84,9 @@ describe('patch regression (constitutional patches)', () => {
       faultJournal: journal,
       invariantEngine: engine,
     });
-    await expect(after.run({ payload: {} })).rejects.toThrow('demo throw');
+    const afterResult = await after.run({ payload: {} });
+    expect(afterResult.status).toBe('failed');
+    expect(afterResult.spanOrphan).toBe(false);
     expect(journal.getAll().some((f) => f.faultCode === FAULT_CODE_SPAN_ORPHAN)).toBe(false);
   });
 });

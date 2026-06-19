@@ -9,15 +9,16 @@
     "services/*"
   ],
   "scripts": {
-    "build": "pnpm -r run build",
-    "test": "pnpm -r run build && pnpm exec vitest run",
-    "test:packages": "pnpm -r run test",
+    "build": "corepack pnpm -r run build",
+    "test": "corepack pnpm -r run build && corepack pnpm exec vitest run",
+    "test:packages": "corepack pnpm -r run test",
     "build:legacy": "tsc -p tsconfig.json",
     "test:legacy": "npm run build:legacy && node --test dist/tests/*.test.js",
     "drift-demo": "tsx tools/scripts/drift-demo.ts",
     "patch-demo": "tsx tools/patch-effectiveness-demo.ts",
     "telemetry": "tsx tools/telemetry-cli.ts",
-    "ops-console": "pnpm --filter @aaes-os/ops-console start"
+    "coverage:docs": "tsx tools/check-doc-coverage.ts",
+    "ops-console": "corepack pnpm --filter @aaes-os/ops-console start"
   },
   "engines": {
     "node": ">=20"

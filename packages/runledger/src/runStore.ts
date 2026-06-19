@@ -12,6 +12,8 @@ import {
   type SpanRecord,
 } from './models.js';
 
+export { asInvariantId } from './models.js';
+
 export class RunLedgerError extends Error {
   constructor(
     readonly code: string,
