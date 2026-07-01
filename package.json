@@ -23,6 +23,9 @@
   "engines": {
     "node": ">=20"
   },
+  "dependencies": {
+    "@aaes-os/architect-agent": "workspace:*"
+  },
   "devDependencies": {
     "@types/node": "^22.19.21",
     "tsx": "^4.20.5",

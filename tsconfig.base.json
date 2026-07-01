@@ -15,6 +15,7 @@
     "composite": true,
     "baseUrl": ".",
     "paths": {
+      "@aaes-os/architect-agent": ["packages/architect-agent/src/index.ts"],
       "@aaes-os/runledger": ["packages/runledger/src/index.ts"],
       "@aaes-os/aaes-governance": ["packages/aaes-governance/src/index.ts"],
       "@aaes-os/trace-bus": ["packages/trace-bus/src/index.ts"],

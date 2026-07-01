@@ -7,6 +7,7 @@ const rootDir = path.dirname(fileURLToPath(import.meta.url));
 export default defineConfig({
   resolve: {
     alias: {
+      '@aaes-os/architect-agent': path.join(rootDir, 'packages/architect-agent/src/index.ts'),
       '@aaes-os/runledger': path.join(rootDir, 'packages/runledger/src/index.ts'),
       '@aaes-os/aaes-governance': path.join(rootDir, 'packages/aaes-governance/src/index.ts'),
       '@aaes-os/trace-bus': path.join(rootDir, 'packages/trace-bus/src/index.ts'),
@@ -28,7 +29,13 @@ export default defineConfig({
     },
   },
   test: {
-    include: ['tests/integration/**/*.test.ts', 'packages/**/src/**/*.test.ts', 'services/**/src/**/*.test.ts', 'services/**/src/**/*.test.tsx'],
+    include: [
+      'tests/integration/**/*.test.ts',
+      'tests/model/**/*.test.ts',
+      'packages/**/src/**/*.test.ts',
+      'services/**/src/**/*.test.ts',
+      'services/**/src/**/*.test.tsx',
+    ],
     environment: 'node',
   },
 });
