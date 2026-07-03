@@ -33,7 +33,22 @@
       "@aaes-os/invariant-registry": ["packages/invariant-registry/src/index.ts"],
       "@aaes-os/nimf": ["packages/nimf/src/index.ts"],
       "@aaes-os/constitutional-evolution": ["packages/constitutional-evolution/src/index.ts"],
-      "@aaes-os/omega-stress-harness": ["packages/omega-stress-harness/src/index.ts"]
+      "@aaes-os/omega-stress-harness": ["packages/omega-stress-harness/src/index.ts"],
+      "@aaes-os/governed-runtime": ["packages/governed-runtime/src/index.ts"],
+      "@aaes-os/nova-shell": ["packages/nova-shell/src/index.ts"],
+      "@aaes-os/infinity-agents": ["packages/infinity-agents/src/index.ts"],
+      "@aaes-os/sandbox": ["packages/sandbox/src/index.ts"],
+      "@aaes-os/coding-assistant": ["packages/coding-assistant/src/index.ts"],
+      "@aaes-os/sovren": ["packages/sovren/src/index.ts"],
+      "@aaes-os/kerno": ["packages/kerno/src/index.ts"],
+      "@aaes-os/federation": ["packages/federation/src/index.ts"],
+      "@aaes-os/nova-substrate-client": ["packages/nova-substrate-client/src/index.ts"],
+      "@aaes-os/platform-core": ["packages/platform-core/src/index.ts"],
+      "@aaes-os/platform-mesh": ["packages/platform-mesh/src/index.ts"],
+      "@aaes-os/psom-mesh": ["packages/psom-mesh/src/index.ts"],
+      "@aaes-os/sgce": ["packages/sgce/src/index.ts"],
+      "@aaes-os/platform-sdk": ["packages/platform-sdk/src/index.ts"],
+      "@aaes-os/platform-cli": ["packages/platform-cli/src/cli.ts"]
     }
   }
 }

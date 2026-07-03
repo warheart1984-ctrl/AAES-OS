@@ -1,0 +1,23 @@
+import { defineConfig } from 'vitest/config';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const pkgDir = path.dirname(fileURLToPath(import.meta.url));
+
+export default defineConfig({
+  resolve: {
+    alias: {
+      '@aaes-os/platform-core': path.join(pkgDir, '../platform-core/src/index.ts'),
+      '@aaes-os/psom-mesh': path.join(pkgDir, '../psom-mesh/src/index.ts'),
+      '@aaes-os/sgce': path.join(pkgDir, '../sgce/src/index.ts'),
+      '@aaes-os/governed-runtime': path.join(pkgDir, '../governed-runtime/src/index.ts'),
+      '@aaes-os/federation': path.join(pkgDir, '../federation/src/index.ts'),
+      '@aaes-os/aaes-governance': path.join(pkgDir, '../aaes-governance/src/index.ts'),
+      '@aaes-os/sovren': path.join(pkgDir, '../sovren/src/index.ts'),
+    },
+  },
+  test: {
+    include: ['src/**/*.test.ts'],
+    environment: 'node',
+  },
+});

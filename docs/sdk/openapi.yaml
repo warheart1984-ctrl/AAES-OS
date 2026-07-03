@@ -1,0 +1,99 @@
+openapi: 3.1.0
+info:
+  title: AAES Super-Platform API
+  version: 0.1.0
+  description: REST API for governed capability invocation, billing, and mesh networking
+servers:
+  - url: http://localhost:4100
+paths:
+  /v1/auth/login:
+    post:
+      summary: Create authenticated session
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ownerId: { type: string }
+                governanceProfile:
+                  type: string
+                  enum: [strict, balanced, experimental]
+      responses:
+        '200':
+          description: Session created
+  /v1/auth/keys:
+    post:
+      summary: Generate API key
+      security: [{ bearerAuth: [] }, { sessionAuth: [] }]
+      responses:
+        '201':
+          description: Key created
+    get:
+      summary: List API keys
+      security: [{ bearerAuth: [] }, { sessionAuth: [] }]
+      responses:
+        '200':
+          description: Key list
+  /v1/governance/profiles:
+    get:
+      summary: List governance profiles
+      responses:
+        '200':
+          description: Profile list
+  /v1/capabilities/publish:
+    post:
+      summary: Publish capability version
+      security: [{ bearerAuth: [] }, { sessionAuth: [] }]
+      responses:
+        '201':
+          description: Capability published
+  /v1/capabilities/{id}/invoke:
+    post:
+      summary: Invoke capability under governance
+      security: [{ bearerAuth: [] }, { sessionAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Invocation result with billing
+  /v1/billing/usage:
+    get:
+      summary: Usage metering summary
+      security: [{ bearerAuth: [] }, { sessionAuth: [] }]
+      responses:
+        '200':
+          description: Usage summary
+  /v1/mesh/discover:
+    get:
+      summary: Discover organisms on the mesh
+      responses:
+        '200':
+          description: Organism descriptors
+  /v1/mesh/connect:
+    post:
+      summary: Initiate organism connection
+      security: [{ bearerAuth: [] }, { sessionAuth: [] }]
+      responses:
+        '201':
+          description: Connection initiated
+  /v1/workflows/run:
+    post:
+      summary: Route cross-organism workflow
+      security: [{ bearerAuth: [] }, { sessionAuth: [] }]
+      responses:
+        '200':
+          description: Workflow results
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+    sessionAuth:
+      type: apiKey
+      in: header
+      name: x-session-id

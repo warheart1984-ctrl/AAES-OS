@@ -1,0 +1,18 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist",
+    "composite": true
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["dist", "node_modules", "src/**/*.test.ts"],
+  "references": [
+    { "path": "../../packages/platform-core" },
+    { "path": "../../packages/platform-mesh" },
+    { "path": "../../packages/psom-mesh" },
+    { "path": "../../packages/sgce" },
+    { "path": "../../packages/sovren" },
+    { "path": "../../packages/aaes-governance" }
+  ]
+}

@@ -1,0 +1,50 @@
+﻿name: Windows CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  windows-governed-runtime:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Install local model runtime
+        run: |
+          curl -fsSL https://ollama.ai/install.sh | sh
+          ollama --version
+
+      - name: Start model server
+        run: |
+          ollama serve &
+          timeout /t 5
+
+      - name: Pull qwen2.5-coder:3b
+        run: ollama pull qwen2.5-coder:3b
+
+      - name: Run unit tests
+        run: pnpm test --filter architect-agent-tests --test-pattern unit
+
+      - name: Run integration tests
+        run: pnpm test --filter architect-agent-tests --test-pattern integration
+
+      - name: Run dist smoke tests
+        run: pnpm test --filter architect-agent-tests --test-pattern dist-smoke
+
+      - name: Run model inference tests
+        run: pnpm test --filter architect-agent-tests --test-pattern model
+

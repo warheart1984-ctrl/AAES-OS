@@ -1,0 +1,44 @@
+name: SDK Publish
+
+on:
+  push:
+    tags:
+      - 'sdk-v*'
+  workflow_dispatch:
+
+jobs:
+  build-typescript:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @aaes-os/platform-core build
+      - run: pnpm --filter @aaes-os/psom-mesh build
+      - run: pnpm --filter @aaes-os/sgce build
+      - run: pnpm --filter @aaes-os/platform-sdk build
+      - run: pnpm --filter @aaes-os/platform-sdk test
+      - uses: actions/upload-artifact@v4
+        with:
+          name: platform-sdk-dist
+          path: packages/platform-sdk/dist/
+
+  build-python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install build
+      - run: python -m build sdk/python
+      - uses: actions/upload-artifact@v4
+        with:
+          name: python-sdk-dist
+          path: sdk/python/dist/

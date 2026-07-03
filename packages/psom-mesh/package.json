@@ -1,0 +1,29 @@
+{
+  "name": "@aaes-os/psom-mesh",
+  "version": "0.1.0",
+  "description": "Planet-Scale Organism Mesh — discovery, routing, governance enforcement, and failover",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "vitest run --config vitest.config.ts"
+  },
+  "dependencies": {
+    "@aaes-os/aaes-governance": "workspace:*",
+    "@aaes-os/federation": "workspace:*",
+    "@aaes-os/platform-core": "workspace:*",
+    "@aaes-os/sovren": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.21",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4"
+  }
+}

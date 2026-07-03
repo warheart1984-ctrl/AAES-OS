@@ -1,0 +1,30 @@
+{
+  "name": "@aaes-os/platform-web",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Next.js developer dashboard and mesh visualization for PSOM + SGCE",
+  "scripts": {
+    "dev": "next dev -p 3000",
+    "build": "next build",
+    "start": "next start -p 3000",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@aaes-os/aaes-governance": "workspace:*",
+    "@aaes-os/platform-core": "workspace:*",
+    "@aaes-os/platform-mesh": "workspace:*",
+    "@aaes-os/platform-sdk": "workspace:*",
+    "@aaes-os/psom-mesh": "workspace:*",
+    "@aaes-os/sgce": "workspace:*",
+    "@aaes-os/sovren": "workspace:*",
+    "next": "^15.5.3",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.21",
+    "@types/react": "^19.1.13",
+    "@types/react-dom": "^19.1.9",
+    "typescript": "^5.9.3"
+  }
+}

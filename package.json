@@ -18,13 +18,19 @@
     "patch-demo": "tsx tools/patch-effectiveness-demo.ts",
     "telemetry": "tsx tools/telemetry-cli.ts",
     "coverage:docs": "tsx tools/check-doc-coverage.ts",
-    "ops-console": "corepack pnpm --filter @aaes-os/ops-console start"
+    "ops-console": "corepack pnpm --filter @aaes-os/ops-console start",
+    "platform-api": "corepack pnpm --filter @aaes-os/platform-api start",
+    "platform-web": "corepack pnpm --filter @aaes-os/platform-web dev",
+    "organism": "corepack pnpm --filter @aaes-os/platform-cli exec organism",
+    "mesh:simulate": "corepack pnpm --filter @aaes-os/mesh-simulator run simulate",
+    "free-coding": "tsx tools/free-coding-cli.ts"
   },
   "engines": {
     "node": ">=20"
   },
   "dependencies": {
-    "@aaes-os/architect-agent": "workspace:*"
+    "@aaes-os/architect-agent": "workspace:*",
+    "@aaes-os/coding-assistant": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^22.19.21",
