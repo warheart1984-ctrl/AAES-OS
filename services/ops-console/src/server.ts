@@ -34,6 +34,8 @@ import {
   patternLedger,
 } from './telemetryState.js';
 import { getSubsystemCoverage } from './coverageState.js';
+import { getCabTelemetrySummary } from './cabTelemetry.js';
+import { getAaisTelemetryStatus } from './aaisBridge.js';
 
 const PORT = Number(process.env.PORT ?? 4000);
 const serviceDir = path.dirname(fileURLToPath(import.meta.url));
@@ -104,6 +106,31 @@ app.get('/telemetry', (_req, res) => {
     lastFaults: faults.slice(-10).reverse(),
     patchTimeline: patchAnalytics.getTimeline(),
   });
+});
+
+  res.json({
+    ready: Object.values(checks).every(Boolean),
+    checks,
+  });
+});
+
+app.get('/telemetry', async (_req, res) => {
+  const faults = faultJournal.getAll();
+  const patterns = patternLedger.getAll();
+  const drift = new DriftMetrics().computeDrift(faults, patterns);
+  const aais = await getAaisTelemetryStatus();
+  res.json({
+    drift,
+    topPatterns: patternLedger.getTopRecurring(5),
+    lastFaults: faults.slice(-10).reverse(),
+    patchTimeline: patchAnalytics.getTimeline(),
+    cab: getCabTelemetrySummary(),
+    aais,
+  });
+});
+
+app.get('/aais/health', async (_req, res) => {
+  res.json({ aais: await getAaisTelemetryStatus() });
 });
 
 app.get('/mri', (_req, res) => {
