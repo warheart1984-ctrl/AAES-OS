@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-import { styles } from '../lib/styles';
+import { styles } from '../../lib/styles';
 
 const LINKS = [
   { href: '/developer', label: 'Overview' },

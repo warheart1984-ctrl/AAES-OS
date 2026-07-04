@@ -18,7 +18,13 @@ export {
 
 export { FaultJournal } from './faultJournal.js';
 export { DriftMetrics, type DriftScore } from './driftMetrics.js';
-export { PatternLedger, type PatternRecord } from './patternLedger.js';
+export {
+  PatternLedger,
+  type PatternLedgerEntry,
+  type PatternLedgerEntryInput,
+  type PatternRecord,
+} from './patternLedger.js';
+export { type VerdictClass } from './verdict.js';
 export { PatchAnalytics, type PatchEffectivenessRecord } from './patchAnalytics.js';
 
 export {

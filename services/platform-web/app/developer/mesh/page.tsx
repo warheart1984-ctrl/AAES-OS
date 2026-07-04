@@ -1,7 +1,6 @@
 import { DeveloperNav } from '../DeveloperNav';
 import { styles } from '../../../lib/styles';
 import { getMesh, getPsom } from '../../../lib/platform';
-import { listGovernanceProfiles } from '@aaes-os/platform-core';
 
 export default function MeshPage() {
   const mesh = getMesh();

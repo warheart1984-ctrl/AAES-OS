@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-import { getPlatform } from '../../../lib/platform';
+import { getPlatform } from '../../../../lib/platform';
 
 export async function POST(request: Request) {
   const form = await request.formData();
