@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
-import { TRACE_FAULT } from '@aaes-os/trace-bus';
+import { TRACE_FAULT, TRACE_RECEIPT, type TraceReceiptEvent } from '@aaes-os/trace-bus';
 
 import { DefaultUCRRuntime } from './ucrRuntime.js';
+import { StubUCRRuntime } from './stub-runtime.js';
 
 describe('DefaultUCRRuntime integration', () => {
   it('records faults and trace events for bad output with recurrence on repeated runs', async () => {
@@ -20,6 +21,11 @@ describe('DefaultUCRRuntime integration', () => {
 
     const faultEvents = bus.getLog().filter((event) => event.type === TRACE_FAULT);
     expect(faultEvents.length).toBeGreaterThanOrEqual(2);
+
+    const receiptEvents = bus.getLog().filter((event): event is TraceReceiptEvent => event.type === TRACE_RECEIPT);
+    expect(receiptEvents).toHaveLength(2);
+    expect(receiptEvents.every((event) => event.receipt.kind === 'runtime')).toBe(true);
+    expect(receiptEvents.every((event) => event.receipt.claimLabel === 'runtime-run-failed')).toBe(true);
   });
 
   it('passes invariants for good demo schedule', async () => {
@@ -35,5 +41,46 @@ describe('DefaultUCRRuntime integration', () => {
     const result = await runtime.run({ kind: 'demo', runIndex: 0 });
 
     expect(result.faults.some((fault) => fault.faultCode.includes('DETERMINISM'))).toBe(true);
+  });
+});
+
+describe('StubUCRRuntime compatibility', () => {
+  it('delegates to the governed runtime path', async () => {
+    const runtime = new StubUCRRuntime();
+
+    const result = await runtime.run({
+      label: 'governed-run',
+      payload: { message: 'hello' },
+      metadata: { actorId: 'tester' },
+    });
+
+    expect(result.status).toBe('completed');
+    expect(result.traceEventCount).toBeGreaterThan(4);
+  });
+});
+
+describe('UCRRuntime evidence receipts', () => {
+  it('writes a terminal evidence receipt and trace receipt event for replay', async () => {
+    const runtime = new DefaultUCRRuntime({ enablePatches: false, demoSchedule: ['good'] });
+
+    const result = await runtime.run({
+      kind: 'demo',
+      payload: { ok: true },
+      runIndex: 0,
+    });
+
+    const receipt = runtime.getReceiptStore().getLatest();
+    const traceEvents = runtime.getTraceBus().getLogForRun(result.runId);
+
+    expect(receipt).toMatchObject({
+      kind: 'runtime',
+      claimLabel: 'runtime-run-completed',
+      subsystem: 'ucr-runtime',
+      issuedAt: expect.any(String),
+    });
+    expect(receipt?.evidenceRefs).toContain(`run:${result.runId}`);
+    expect(receipt?.evidenceRefs).toContain('status:completed');
+    expect(receipt?.evidenceRefs).toContain('span-orphan:no');
+    expect(traceEvents.some((event) => event.type === 'TRACE_RECEIPT')).toBe(true);
   });
 });

@@ -72,6 +72,5 @@ export function clearPatchGlobals(): void {
 }
 
 declare global {
-  // eslint-disable-next-line no-var
   var patchProvenance: PatchProvenanceChain | undefined;
 }

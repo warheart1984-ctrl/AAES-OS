@@ -1,6 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, type FormEvent } from 'react';
 
+import type { ProofSurfaceSummary } from '@aaes-os/aaes-governance';
 import { PatchApprovals } from './PatchApprovals.js';
+import {
+  DEFAULT_PROOF_SURFACE_CATALOG_URL,
+  PROOF_SURFACE_CATALOG_STORAGE_KEY,
+  resolveInitialProofSurfaceCatalogUrl,
+  normalizeProofSurfaceCatalogUrl,
+} from './catalogConfig.js';
 
 type DriftScore = {
   score: number;
@@ -39,6 +46,7 @@ type TelemetryResponse = {
   topPatterns: PatternRecord[];
   lastFaults: FaultEvent[];
   patchTimeline?: PatchPoint[];
+  proofSurfaces?: ProofSurfaceSummary[];
   aais?: {
     connected: boolean;
     baseUrl: string;
@@ -126,8 +134,27 @@ type LoadedState = {
   meta: MetaSummary;
 };
 
+type ProofSurfaceCatalogState = {
+  status: 'loading' | 'loaded' | 'error';
+  catalogUrl: string;
+  error?: string;
+  proofSurfaces: ProofSurfaceSummary[];
+};
+
 export const App: React.FC = () => {
   const [state, setState] = useState<LoadedState | null>(null);
+  const [proofSurfaceCatalog, setProofSurfaceCatalog] = useState<ProofSurfaceCatalogState>(() => {
+    const initialCatalogUrl = resolveInitialProofSurfaceCatalogUrl(
+      typeof window === 'undefined' ? '' : window.location.search,
+      typeof window === 'undefined' ? null : window.localStorage.getItem(PROOF_SURFACE_CATALOG_STORAGE_KEY),
+    );
+    return {
+      status: 'loading',
+      catalogUrl: initialCatalogUrl,
+      proofSurfaces: [],
+    };
+  });
+  const [catalogUrlInput, setCatalogUrlInput] = useState(proofSurfaceCatalog.catalogUrl);
 
   useEffect(() => {
     const fetchTelemetry = async () => {
@@ -160,14 +187,137 @@ export const App: React.FC = () => {
     return () => clearInterval(id);
   }, []);
 
+  useEffect(() => {
+    let cancelled = false;
+    const loadCatalog = async () => {
+      setProofSurfaceCatalog((current) => ({
+        ...current,
+        status: 'loading',
+        error: undefined,
+      }));
+
+      try {
+        const proofRes = await fetch(proofSurfaceCatalog.catalogUrl, {
+          headers: {
+            accept: 'application/json',
+          },
+        });
+
+        if (!proofRes.ok) {
+          throw new Error(`catalog request failed with ${proofRes.status}`);
+        }
+
+        const proofPayload = (await proofRes.json()) as {
+          summaries?: ProofSurfaceSummary[];
+          catalog?: { surfaces?: Array<{ surface?: unknown }> };
+        };
+        const summaries = Array.isArray(proofPayload.summaries)
+          ? proofPayload.summaries
+          : Array.isArray(proofPayload.catalog?.surfaces)
+            ? proofPayload.catalog.surfaces
+                .map((entry) => entry.surface)
+                .filter(isProofSurfaceSummary)
+            : [];
+
+        if (!cancelled) {
+          setProofSurfaceCatalog({
+            status: 'loaded',
+            catalogUrl: proofSurfaceCatalog.catalogUrl,
+            proofSurfaces: summaries,
+          });
+        }
+      } catch (error) {
+        if (!cancelled) {
+          setProofSurfaceCatalog({
+            status: 'error',
+            catalogUrl: proofSurfaceCatalog.catalogUrl,
+            error: error instanceof Error ? error.message : String(error),
+            proofSurfaces: [],
+          });
+        }
+      }
+    };
+
+    void loadCatalog();
+    return () => {
+      cancelled = true;
+    };
+  }, [proofSurfaceCatalog.catalogUrl]);
+
+  const applyCatalogUrl = (nextCatalogUrl: string) => {
+    const normalizedCatalogUrl = normalizeProofSurfaceCatalogUrl(nextCatalogUrl);
+    setCatalogUrlInput(normalizedCatalogUrl);
+    setProofSurfaceCatalog((current) => ({
+      ...current,
+      status: 'loading',
+      catalogUrl: normalizedCatalogUrl,
+      error: undefined,
+      proofSurfaces: current.status === 'loaded' ? current.proofSurfaces : [],
+    }));
+
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem(PROOF_SURFACE_CATALOG_STORAGE_KEY, normalizedCatalogUrl);
+      const nextLocation = new URL(window.location.href);
+      nextLocation.searchParams.set('catalogUrl', normalizedCatalogUrl);
+      window.history.replaceState({}, '', `${nextLocation.pathname}${nextLocation.search}${nextLocation.hash}`);
+    }
+  };
+
+  const handleCatalogSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    applyCatalogUrl(catalogUrlInput);
+  };
+
+  const resetCatalogUrl = () => {
+    applyCatalogUrl(DEFAULT_PROOF_SURFACE_CATALOG_URL);
+  };
+
+  const useCatalogFromQuery = () => {
+    applyCatalogUrl(resolveInitialProofSurfaceCatalogUrl(window.location.search, null));
+  };
+
   if (!state) return <div>Loading telemetry...</div>;
-  return <OpsConsoleView {...state} />;
+  return (
+    <OpsConsoleShell
+      telemetry={state.telemetry}
+      mriV2={state.mriV2}
+      enforcement={state.enforcement}
+      meta={state.meta}
+      proofSurfaceCatalog={proofSurfaceCatalog}
+      catalogUrlInput={catalogUrlInput}
+      onCatalogUrlInputChange={setCatalogUrlInput}
+      onCatalogSubmit={handleCatalogSubmit}
+      onResetCatalogUrl={resetCatalogUrl}
+      onUseQueryCatalogUrl={useCatalogFromQuery}
+    />
+  );
 };
 
-export const OpsConsoleView: React.FC<LoadedState> = ({ telemetry, mriV2, enforcement, meta }) => (
+type OpsConsoleShellProps = LoadedState & {
+  proofSurfaceCatalog: ProofSurfaceCatalogState;
+  catalogUrlInput: string;
+  onCatalogUrlInputChange: (value: string) => void;
+  onCatalogSubmit: (event: FormEvent<HTMLFormElement>) => void;
+  onResetCatalogUrl: () => void;
+  onUseQueryCatalogUrl: () => void;
+};
+
+export const OpsConsoleShell: React.FC<OpsConsoleShellProps> = ({
+  telemetry,
+  mriV2,
+  enforcement,
+  meta,
+  proofSurfaceCatalog,
+  catalogUrlInput,
+  onCatalogUrlInputChange,
+  onCatalogSubmit,
+  onResetCatalogUrl,
+  onUseQueryCatalogUrl,
+}) => (
   <div style={{ fontFamily: 'system-ui', padding: 16, color: '#172026', background: '#f6f7f9' }}>
     <h1 style={{ margin: '0 0 16px' }}>AAES-OS Ops Console</h1>
     <nav style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
+      <a href="#catalog">Proof Surface Catalog</a>
       <a href="#mri">MRI Cockpit</a>
       <a href="#enforcement">Enforcement Dashboard</a>
       <a href="#meta">Meta-Constitutional Console</a>
@@ -175,6 +325,55 @@ export const OpsConsoleView: React.FC<LoadedState> = ({ telemetry, mriV2, enforc
       <a href="#cab">CAB Continuity</a>
     </nav>
 
+    <section id="catalog" style={sectionStyle}>
+      <h2>Proof Surface Catalog</h2>
+      <p>Point the Ops Console at any proof-surface backend without changing code.</p>
+      <form onSubmit={onCatalogSubmit} style={{ display: 'grid', gap: 12, marginBottom: 12 }}>
+        <label style={{ display: 'grid', gap: 6 }}>
+          <span style={{ fontSize: 13, fontWeight: 600 }}>Catalog URL</span>
+          <input
+            value={catalogUrlInput}
+            onChange={(event) => onCatalogUrlInputChange(event.target.value)}
+            spellCheck={false}
+            placeholder={DEFAULT_PROOF_SURFACE_CATALOG_URL}
+            style={{
+              border: '1px solid #b8c2cf',
+              borderRadius: 10,
+              padding: '10px 12px',
+              fontSize: 14,
+              fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
+            }}
+          />
+        </label>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+          <button type="submit" style={buttonStyle}>Load catalog</button>
+          <button type="button" onClick={onUseQueryCatalogUrl} style={secondaryButtonStyle}>Use URL from query</button>
+          <button type="button" onClick={onResetCatalogUrl} style={secondaryButtonStyle}>Reset to default</button>
+        </div>
+      </form>
+      <div style={{ color: '#5f6b7a', fontSize: 13, display: 'grid', gap: 4, marginBottom: 12 }}>
+        <div>Active catalog: {proofSurfaceCatalog.catalogUrl}</div>
+        <div>Status: {proofSurfaceCatalog.status}</div>
+        {proofSurfaceCatalog.error ? <div>Error: {proofSurfaceCatalog.error}</div> : null}
+      </div>
+      <div style={gridStyle}>
+        {proofSurfaceCatalog.proofSurfaces.map((surface) => (
+          <ProofSurfaceCard key={surface.identity.id} surface={surface} />
+        ))}
+      </div>
+    </section>
+
+    <OpsConsoleView
+      telemetry={telemetry}
+      mriV2={mriV2}
+      enforcement={enforcement}
+      meta={meta}
+    />
+  </div>
+);
+
+export const OpsConsoleView: React.FC<LoadedState> = ({ telemetry, mriV2, enforcement, meta }) => (
+  <div>
     <section id="mri" style={sectionStyle}>
       <h2>MRI Cockpit</h2>
       <p>{mriV2.benchmarks.summary}</p>
@@ -302,12 +501,38 @@ export const OpsConsoleView: React.FC<LoadedState> = ({ telemetry, mriV2, enforc
   </div>
 );
 
+function isProofSurfaceSummary(value: unknown): value is ProofSurfaceSummary {
+  return Boolean(
+    value &&
+      typeof value === 'object' &&
+      'identity' in value &&
+      'proofLevel' in value &&
+      'commercialReadiness' in value,
+  );
+}
+
 const sectionStyle: React.CSSProperties = {
   background: '#fff',
   border: '1px solid #dfe3e8',
   borderRadius: 8,
   padding: 16,
   marginBottom: 16,
+};
+
+const buttonStyle: React.CSSProperties = {
+  border: '1px solid #23405f',
+  borderRadius: 10,
+  padding: '10px 14px',
+  background: '#23405f',
+  color: '#ffffff',
+  fontWeight: 600,
+  cursor: 'pointer',
+};
+
+const secondaryButtonStyle: React.CSSProperties = {
+  ...buttonStyle,
+  background: '#ffffff',
+  color: '#23405f',
 };
 
 const gridStyle: React.CSSProperties = {
@@ -346,6 +571,22 @@ const BenchmarkCard: React.FC<{
       <span style={markerStyle(markers.current, '#138a5e', 8)} />
     </div>
     <div>Delta {formatDelta(delta)}</div>
+  </div>
+);
+
+const ProofSurfaceCard: React.FC<{ surface: ProofSurfaceSummary }> = ({ surface }) => (
+  <div style={{ border: '1px solid #e3e7ed', borderRadius: 6, padding: 12 }}>
+    <div style={{ color: '#5f6b7a', fontSize: 12, textTransform: 'uppercase' }}>{surface.identity.type}</div>
+    <div style={{ fontSize: 18, fontWeight: 700 }}>{surface.identity.name}</div>
+    <p style={{ margin: '8px 0' }}>{surface.identity.id}</p>
+    <p>Proof level: {surface.proofLevel}</p>
+    <p>Verification: {surface.verificationStatus}</p>
+    <p>Replay: {surface.replayStatus}</p>
+    <p>Operational: {surface.operationalStatus}</p>
+    <p style={{ fontSize: 13, color: '#5f6b7a' }}>{surface.truthBoundary}</p>
+    <p style={{ fontSize: 13 }}>Maturity: {surface.currentMaturity}</p>
+    <p style={{ fontSize: 13 }}>Tier: {surface.commercialReadiness.targetTier}</p>
+    <p style={{ fontSize: 13 }}>Next: {surface.nextRequiredEvidence.join(', ')}</p>
   </div>
 );
 

@@ -33,6 +33,21 @@ export class TraceBus {
     return [...this.log];
   }
 
+  getLogForRun(runId: RunId): readonly TraceEvent[] {
+    return this.log
+      .filter((event) => event.runId === runId)
+      .map((event) => structuredClone(event));
+  }
+
+  receipt(runId: RunId, receipt: Record<string, unknown>): void {
+    this.emit({
+      type: 'TRACE_RECEIPT',
+      timestamp: now(),
+      runId,
+      receipt,
+    });
+  }
+
   clear(): void {
     this.log.length = 0;
   }

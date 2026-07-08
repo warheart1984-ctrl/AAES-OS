@@ -11,7 +11,13 @@
   "scripts": {
     "build": "corepack pnpm -r run build",
     "test": "corepack pnpm -r run build && corepack pnpm exec vitest run",
+    "lint": "corepack pnpm exec eslint \"packages/**/*.{js,jsx,ts,tsx,mjs,cjs}\" \"services/**/*.{js,jsx,ts,tsx,mjs,cjs}\" --max-warnings 0",
     "test:packages": "corepack pnpm -r run test",
+    "release:build": "node release/build-release.ts",
+    "release:package": "node release/package-release.ts",
+    "release:sign": "node release/sign-release.ts",
+    "release:verify": "node release/verify-release.ts",
+    "release": "corepack pnpm run release:build && corepack pnpm run release:package && corepack pnpm run release:sign && corepack pnpm run release:verify",
     "build:legacy": "tsc -p tsconfig.json",
     "test:legacy": "npm run build:legacy && node --test dist/tests/*.test.js",
     "drift-demo": "tsx tools/scripts/drift-demo.ts",
@@ -33,9 +39,13 @@
     "@aaes-os/coding-assistant": "workspace:*"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.4",
     "@types/node": "^22.19.21",
+    "eslint": "^9.39.4",
+    "globals": "^16.5.0",
     "tsx": "^4.20.5",
     "typescript": "^5.9.3",
+    "typescript-eslint": "^8.63.0",
     "vitest": "^3.2.4"
   },
   "packageManager": "pnpm@10.15.0"

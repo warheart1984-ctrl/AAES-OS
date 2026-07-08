@@ -54,7 +54,7 @@ describe('OpsConsoleView', () => {
         }}
         enforcement={{ events: [{ receiptId: 'cen:1', verdict: 'DENY', reasonCode: 'INVARIANT_VIOLATION' }], status: 'ACTIVE' }}
         meta={{ podId: 'meta_constitutional_collapse', generativeCoreId: 'CML-15', metaInvariantCount: 4 }}
-      />,
+      />
     );
 
     expect(html).toContain('MRI Cockpit');

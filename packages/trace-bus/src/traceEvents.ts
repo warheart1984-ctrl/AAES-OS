@@ -18,11 +18,15 @@ export type TraceEventType =
   | 'TRACE_SPAN_END'
   | 'TRACE_INVARIANT'
   | 'TRACE_FAULT'
+  | 'TRACE_RECEIPT'
   | 'TRACE_RUN_START'
   | 'TRACE_RUN_END';
 
 /** Event type emitted when an invariant records a fault. */
 export const TRACE_FAULT: TraceEventType = 'TRACE_FAULT';
+
+/** Event type emitted when a governed run writes an evidence receipt. */
+export const TRACE_RECEIPT: TraceEventType = 'TRACE_RECEIPT';
 
 export interface TraceEventBase {
   type: TraceEventType;
@@ -58,11 +62,17 @@ export interface TraceFaultEvent extends TraceEventBase {
   fault: TraceFaultPayload;
 }
 
+export interface TraceReceiptEvent extends TraceEventBase {
+  type: 'TRACE_RECEIPT';
+  receipt: Record<string, unknown>;
+}
+
 export type TraceEvent =
   | TraceSpanEvent
   | TraceRunEvent
   | TraceInvariantEvent
-  | TraceFaultEvent;
+  | TraceFaultEvent
+  | TraceReceiptEvent;
 
 export type TraceListener = (event: TraceEvent) => void;
 

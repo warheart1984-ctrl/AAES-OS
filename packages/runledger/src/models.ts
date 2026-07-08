@@ -30,10 +30,17 @@ export interface SpanRecord {
   name: string;
   startedAt: string;
   endedAt?: string;
+  metadata?: Record<string, unknown>;
   invariantIds?: InvariantId[];
 }
 
 export interface InvariantLink {
   spanId: SpanId;
   invariantId: InvariantId;
+}
+
+export interface RunSnapshot {
+  run: RunRecord;
+  spans: SpanRecord[];
+  invariantLinks: InvariantLink[];
 }

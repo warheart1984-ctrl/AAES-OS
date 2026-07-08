@@ -14,6 +14,7 @@ export class OutputShapeInvariant implements Invariant {
     return {
       invariantId: this.id,
       passed,
+      severity: passed ? 'info' : 'error',
       message: passed ? 'Output shape OK' : 'Output was not an object',
       details: { actualType: typeof ctx.output },
     };

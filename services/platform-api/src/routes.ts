@@ -213,11 +213,9 @@ export function mountRoutes(app: Express): void {
   app.get('/mesh/topology', (_req, res) => res.redirect(307, '/v1/mesh/topology'));
 }
 
-declare global {
-  namespace Express {
-    interface Request {
-      platformCtx?: import('@aaes-os/platform-core').PlatformContext;
-    }
+declare module 'express-serve-static-core' {
+  interface Request {
+    platformCtx?: import('@aaes-os/platform-core').PlatformContext;
   }
 }
 

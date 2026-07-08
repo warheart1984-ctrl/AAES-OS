@@ -1,5 +1,7 @@
 export * from './patchProposals.js';
 export * from './types.js';
+export { TriCoreBus, type TriCoreActor, type TriCoreBusOptions, type TriCoreHandler, type TriCoreMessage } from './TriCoreBus.js';
+export { constitutionalProfile, type ConstitutionalProfile } from './constitutionalProfile.js';
 
 export {
   PatchLedger,

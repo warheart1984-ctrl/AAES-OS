@@ -4,6 +4,11 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { DriftMetrics } from '@aaes-os/aaes-governance';
+import {
+  createDemoProofSurfaceRegistry,
+  createProofSurfaceCatalogDocument,
+  listProofSurfaceSummaries,
+} from '@aaes-os/aaes-governance';
 import { createCenDemoResult, type EnforcementReceipt } from '@aaes-os/constitutional-enforcement-node';
 import {
   evaluateInvariantFitness,
@@ -36,6 +41,11 @@ import {
 import { getSubsystemCoverage } from './coverageState.js';
 import { getCabTelemetrySummary } from './cabTelemetry.js';
 import { getAaisTelemetryStatus } from './aaisBridge.js';
+import { GovernanceAdapter } from './GovernanceAdapter.js';
+import { LedgerAdapter } from './LedgerAdapter.js';
+import { FaultAdapter } from './FaultAdapter.js';
+import { RuntimeAdapter } from './RuntimeAdapter.js';
+import { SubstrateAdapter } from './SubstrateAdapter.js';
 
 const PORT = Number(process.env.PORT ?? 4000);
 const serviceDir = path.dirname(fileURLToPath(import.meta.url));
@@ -68,7 +78,14 @@ const cenReceipts = new Map<string, EnforcementReceipt>([
   [seededCenResult.receipt.receiptId, seededCenResult.receipt],
 ]);
 
+const governanceAdapter = new GovernanceAdapter(faultJournal.getAll());
+const ledgerAdapter = new LedgerAdapter(listPatches);
+const faultAdapter = new FaultAdapter(faultJournal);
+const runtimeAdapter = new RuntimeAdapter(() => false);
+const substrateAdapter = new SubstrateAdapter(() => false);
+
 const app = express();
+const proofSurfaceRegistry = createDemoProofSurfaceRegistry();
 app.use((req, res, next) => {
   const requestId = req.header('x-request-id') ?? `req-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
   res.setHeader('x-request-id', requestId);
@@ -78,6 +95,17 @@ app.use((req, res, next) => {
   next();
 });
 app.use(express.json({ limit: '1mb' }));
+
+app.use('/proof-surfaces', (req, res, next) => {
+  res.setHeader('access-control-allow-origin', '*');
+  res.setHeader('access-control-allow-methods', 'GET, OPTIONS');
+  res.setHeader('access-control-allow-headers', 'content-type, accept');
+  if (req.method === 'OPTIONS') {
+    res.status(204).end();
+    return;
+  }
+  next();
+});
 
 app.get('/health', (_req, res) => {
   res.json({ ok: true });
@@ -108,7 +136,37 @@ app.get('/telemetry', async (_req, res) => {
     patchTimeline: patchAnalytics.getTimeline(),
     cab: getCabTelemetrySummary(),
     aais,
+    proofSurfaces: listProofSurfaceSummaries(proofSurfaceRegistry),
   });
+});
+
+app.get('/proof-surfaces', (_req, res) => {
+  const records = proofSurfaceRegistry.list();
+  res.json({
+    catalog: createProofSurfaceCatalogDocument(records),
+    records,
+    summaries: listProofSurfaceSummaries(proofSurfaceRegistry),
+  });
+});
+
+app.get('/governance', (_req, res) => {
+  res.json(governanceAdapter.snapshot());
+});
+
+app.get('/ledger', (_req, res) => {
+  res.json(ledgerAdapter.snapshot());
+});
+
+app.get('/faults', (_req, res) => {
+  res.json(faultAdapter.snapshot());
+});
+
+app.get('/runtime', (_req, res) => {
+  res.json(runtimeAdapter.snapshot());
+});
+
+app.get('/substrate', (_req, res) => {
+  res.json(substrateAdapter.snapshot());
 });
 
 app.get('/aais/health', async (_req, res) => {

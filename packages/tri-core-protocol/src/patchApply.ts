@@ -5,7 +5,6 @@ export const PATCH_DETERMINISM_001 = 'PATCH_DETERMINISM_001';
 export const PATCH_SPAN_BOUNDARY_001 = 'PATCH_SPAN_BOUNDARY_001';
 
 declare global {
-  // eslint-disable-next-line no-var
   var patchLedger: PatchLedger | undefined;
 }
 

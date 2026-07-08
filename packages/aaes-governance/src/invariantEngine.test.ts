@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { RunStore } from '@aaes-os/runledger';
+import { TraceBus } from '@aaes-os/trace-bus';
 
 import {
   DeterminismInvariant,
@@ -74,5 +75,25 @@ describe('InvariantEngine.evaluateAll', () => {
     await engine.evaluateAll(context);
 
     expect(journal.getByRun(run.runId).length).toBeGreaterThanOrEqual(2);
+  });
+
+  it('emits trace faults when an invariant fails', async () => {
+    const journal = new FaultJournal();
+    const traceBus = new TraceBus();
+    const engine = new InvariantEngine(journal, traceBus);
+    engine.register(new OutputShapeInvariant());
+
+    const store = new RunStore();
+    const run = store.startRun();
+    const span = store.startSpan(run.runId, { name: 'test' });
+
+    await engine.evaluateAll({
+      runId: run.runId,
+      spanId: span.spanId,
+      input: {},
+      output: 'bad',
+    });
+
+    expect(traceBus.getLog().some((event) => event.type === 'TRACE_FAULT')).toBe(true);
   });
 });

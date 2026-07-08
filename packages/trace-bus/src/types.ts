@@ -5,6 +5,7 @@ export type TraceEventType =
   | 'TRACE_STEP'
   | 'TRACE_DECISION'
   | 'TRACE_FAULT'
+  | 'TRACE_RECEIPT'
   | 'TRACE_PATCH'
   | 'TRACE_END'
   | 'TRACE_INVARIANT'

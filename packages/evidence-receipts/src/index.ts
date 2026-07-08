@@ -91,6 +91,8 @@ export function verifyReceiptHash(receipt: EvidenceReceipt): boolean {
   return receipt.subjectHash.startsWith('sha3-256:') && receipt.receiptId.startsWith('evidence:');
 }
 
+export { ReceiptStore, type StoredReceipt } from './ReceiptStore.js';
+
 function inferKind(subsystem: string, claimLabel: string): EvidenceReceiptKind {
   const value = `${subsystem} ${claimLabel}`.toLowerCase();
   if (value.includes('mri')) return 'mri';

@@ -1,0 +1,17 @@
+{
+  "name": "aaes-os",
+  "version": "0.1.0",
+  "bundle": "release/bundle",
+  "artifacts": [
+    "README.md",
+    "docs/README.md",
+    "docs/architecture/README.md",
+    "docs/architecture/AAES_OS_UCR_MAPPING.md",
+    "docs/scorecards/project-infi.md",
+    "package.json",
+    "release/build-release.ts",
+    "release/package-release.ts",
+    "release/sign-release.ts",
+    "release/verify-release.ts"
+  ]
+}

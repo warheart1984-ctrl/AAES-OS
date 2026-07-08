@@ -46,6 +46,7 @@ export default defineConfig({
     include: [
       'tests/integration/**/*.test.ts',
       'tests/model/**/*.test.ts',
+      'tests/release/**/*.test.ts',
       'packages/**/src/**/*.test.ts',
       'services/**/src/**/*.test.ts',
       'services/**/src/**/*.test.tsx',

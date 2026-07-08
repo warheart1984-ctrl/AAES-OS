@@ -1,4 +1,8 @@
 export { StubUCRRuntime, type StubUCRRuntimeOptions } from './stub-runtime.js';
+export { RuntimeCore, type RuntimeCoreOptions, type RuntimeCoreResult } from './RuntimeCore.js';
+export { AgentBridge, type AgentAction, type AgentBridgeOptions } from './AgentBridge.js';
+export { SubstrateBridge, type SubstrateSignal, type SubstrateBridgeOptions } from './SubstrateBridge.js';
+export { constitutionalProfile, type ConstitutionalProfile } from './constitutionalProfile.js';
 export {
   DefaultUCRRuntime,
   UCRRuntime,

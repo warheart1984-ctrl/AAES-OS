@@ -59,6 +59,32 @@ describe('GET /telemetry', () => {
     expect(Array.isArray(body.patchTimeline)).toBe(true);
   });
 
+  it('returns the proof-surface catalog for operators and dashboards', async () => {
+    const response = await fetch(`${baseUrl}/proof-surfaces`);
+    expect(response.status).toBe(200);
+    expect(response.headers.get('content-type')).toContain('application/json');
+
+    const body = (await response.json()) as {
+      catalog: { schemaVersion: string; surfaces: unknown[] };
+      records: unknown[];
+      summaries: { identity: { id: string }; proofLevel: string }[];
+    };
+
+    expect(body.catalog.schemaVersion).toBe('1.0');
+    expect(body.records.length).toBeGreaterThan(0);
+    expect(body.summaries.some((surface) => surface.identity.id === '@aaes-os/aaes-governance')).toBe(true);
+  });
+
+  it('allows the studio to fetch proof surfaces cross-origin', async () => {
+    const response = await fetch(`${baseUrl}/proof-surfaces`, {
+      method: 'OPTIONS',
+    });
+
+    expect(response.status).toBe(204);
+    expect(response.headers.get('access-control-allow-origin')).toBe('*');
+    expect(response.headers.get('access-control-allow-methods')).toContain('GET');
+  });
+
   it('surfaces CAB ledger summary and invariant status for operators', async () => {
     const previousStore = process.env.CAB_STORE;
     const tempDir = mkdtempSync(path.join(tmpdir(), 'cab-ledger-'));

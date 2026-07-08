@@ -36,6 +36,7 @@ export class DeterminismInvariant implements Invariant {
       return {
         invariantId: this.id,
         passed: true,
+        severity: 'info',
         message: 'Skipped: non-object output',
       };
     }
@@ -45,6 +46,7 @@ export class DeterminismInvariant implements Invariant {
     return {
       invariantId: this.id,
       passed,
+      severity: passed ? 'info' : 'error',
       message: passed
         ? 'Deterministic output'
         : 'Detected randomness or timestamp in output',

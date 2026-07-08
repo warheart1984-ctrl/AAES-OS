@@ -13,6 +13,7 @@ export {
   type InvariantLink,
   type RunId,
   type RunRecord,
+  type RunSnapshot,
   type SpanId,
   type SpanRecord,
 } from './models.js';

@@ -1,67 +1,30 @@
-import { randomUUID } from 'node:crypto';
+import { UCRRuntime, type UCRRuntimeOptions } from './ucrRuntime.js';
+import type { UCRRunInput, UCRRunResult, UCRRuntime as UCRRuntimeInterface } from './types.js';
 
-import { RunStore } from '@aaes-os/runledger';
-import { TraceBusClient } from '@aaes-os/trace-bus';
+export type StubUCRRuntimeOptions = UCRRuntimeOptions;
 
-import type { UCRRunInput, UCRRunResult, UCRRuntime } from './types.js';
-
-export interface StubUCRRuntimeOptions {
-  runStore?: RunStore;
-  traceBus?: TraceBusClient;
-  spanName?: string;
-}
-
-/** Phase 3 stub — wires runledger + trace-bus for a minimal governed run. */
-export class StubUCRRuntime implements UCRRuntime {
-  private readonly runStore: RunStore;
-  private readonly traceBus: TraceBusClient;
-  private readonly spanName: string;
+/** Compatibility adapter that delegates to the governed runtime path. */
+export class StubUCRRuntime implements UCRRuntimeInterface {
+  private readonly runtime: UCRRuntime;
 
   constructor(options: StubUCRRuntimeOptions = {}) {
-    this.runStore = options.runStore ?? new RunStore();
-    this.traceBus = options.traceBus ?? new TraceBusClient();
-    this.spanName = options.spanName ?? 'ucr.execute';
+    this.runtime = new UCRRuntime(options);
   }
 
   async run(input: UCRRunInput): Promise<UCRRunResult> {
-    const run = this.runStore.startRun({ metadata: input.metadata });
-    this.traceBus.emit({
-      type: 'TRACE_RUN',
-      runId: run.runId,
-      timestamp: run.startedAt,
-      payload: { label: input.label, ...input.payload },
+    const traceBus = this.runtime.getTraceBus();
+    const before = traceBus.getLog().length;
+    const result = await this.runtime.run({
+      kind: input.label,
+      metadata: input.metadata,
+      payload: input.payload,
     });
-
-    const span = this.runStore.startSpan(run.runId, { name: this.spanName });
-    this.traceBus.emit({
-      type: 'TRACE_SPAN',
-      runId: run.runId,
-      spanId: span.spanId,
-      timestamp: span.startedAt,
-      payload: { name: span.name, phase: 'started' },
-    });
-
-    this.runStore.endSpan(span.spanId);
-    this.traceBus.emit({
-      type: 'TRACE_SPAN',
-      runId: run.runId,
-      spanId: span.spanId,
-      timestamp: new Date().toISOString(),
-      payload: { phase: 'ended' },
-    });
-
-    const ended = this.runStore.endRun(run.runId);
-    this.traceBus.emit({
-      type: 'TRACE_RUN',
-      runId: run.runId,
-      timestamp: ended.endedAt ?? new Date().toISOString(),
-      payload: { phase: 'ended' },
-    });
+    const after = traceBus.getLog().length;
 
     return {
-      runId: run.runId,
-      status: 'completed',
-      traceEventCount: this.traceBus.getLog().length,
+      runId: result.runId,
+      status: result.status,
+      traceEventCount: after - before,
     };
   }
 }

@@ -5,7 +5,7 @@ import {
   GovernanceHub,
   PatternLedger,
 } from '@aaes-os/aaes-governance';
-import { TraceBus } from '@aaes-os/trace-bus';
+import { TRACE_RECEIPT, TraceBus, type TraceReceiptEvent } from '@aaes-os/trace-bus';
 import { UCRRuntime } from './ucrRuntime.js';
 
 describe('UCRRuntime governance hub integration', () => {
@@ -33,6 +33,13 @@ describe('UCRRuntime governance hub integration', () => {
     expect(traceLog.some((e) => e.type === 'TRACE_FAULT')).toBe(true);
     expect(traceLog.some((e) => e.type === 'TRACE_INVARIANT')).toBe(true);
     expect(traceLog.some((e) => e.type === 'TRACE_RUN_START')).toBe(true);
+
+    const receiptEvents = traceLog.filter((event): event is TraceReceiptEvent => event.type === TRACE_RECEIPT);
+    expect(receiptEvents).toHaveLength(1);
+    expect(receiptEvents[0]?.receipt).toMatchObject({
+      kind: 'runtime',
+      claimLabel: 'runtime-run-failed',
+    });
 
     hub.dispose();
   });

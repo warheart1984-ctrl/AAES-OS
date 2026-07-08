@@ -60,4 +60,24 @@ describe('RunStore', () => {
 
     expect(() => store.endRun(run.runId)).toThrow(/open spans/i);
   });
+
+  it('clones run and span metadata and exposes a replay snapshot', () => {
+    const store = new RunStore();
+    const runMetadata = { label: 'demo', tags: ['alpha'] };
+    const spanMetadata = { stage: 'execution', sequence: 1 };
+
+    const run = store.startRun({ metadata: runMetadata });
+    const span = store.startSpan(run.runId, { name: 'step', metadata: spanMetadata });
+
+    runMetadata.label = 'mutated';
+    spanMetadata.stage = 'mutated';
+
+    const snapshot = store.getRunSnapshot(run.runId);
+
+    expect(snapshot?.run.metadata).toEqual({ label: 'demo', tags: ['alpha'] });
+    expect(snapshot?.spans[0]?.metadata).toEqual({ stage: 'execution', sequence: 1 });
+    expect(snapshot?.invariantLinks).toHaveLength(0);
+    expect(snapshot?.run.runId).toBe(run.runId);
+    expect(snapshot?.spans[0]?.spanId).toBe(span.spanId);
+  });
 });

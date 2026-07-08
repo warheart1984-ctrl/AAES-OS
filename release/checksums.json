@@ -1,0 +1,58 @@
+{
+  "name": "aaes-os",
+  "version": "0.1.0",
+  "bundle": "release/bundle",
+  "files": [
+    {
+      "path": "README.md",
+      "sha256": "e171e07d383972181f8f93e2344a03f273af563f3e591bffeb3546bf4cd6d48e",
+      "size": 13498
+    },
+    {
+      "path": "docs/README.md",
+      "sha256": "9c0a90806489c10fd7368cdb4844de3414e02431d6c70632875edd0402c9d741",
+      "size": 3025
+    },
+    {
+      "path": "docs/architecture/README.md",
+      "sha256": "92d259da9d5a6aa9bf6b5b676a8cd756a92512635111b8000472f52ac9a42ad4",
+      "size": 540
+    },
+    {
+      "path": "docs/architecture/AAES_OS_UCR_MAPPING.md",
+      "sha256": "d509692e42e0d4ee591d0d7f3356bfc1ee79711528dfb99f449cca1b726f74d2",
+      "size": 5271
+    },
+    {
+      "path": "docs/scorecards/project-infi.md",
+      "sha256": "8cbfe9f9c64f06e8c413e2fec194333e13d5b76f451fce8f6397b719cf469d1c",
+      "size": 23654
+    },
+    {
+      "path": "package.json",
+      "sha256": "ce1d5c48b340244a2b54521e242a6b4f4f7e6d81447c46ff23db2f55027c2e09",
+      "size": 2161
+    },
+    {
+      "path": "release/build-release.ts",
+      "sha256": "c2beb3df42f24442ae48f81b7da7aaa89e0a2344c2ab5b18f5b9e03adf6ba005",
+      "size": 614
+    },
+    {
+      "path": "release/package-release.ts",
+      "sha256": "763c82b811e9fc948c12f6610adddf26692c1bdb63cbe2bc04eb8776017380f8",
+      "size": 1277
+    },
+    {
+      "path": "release/sign-release.ts",
+      "sha256": "31bf72805da03551ff95970d5fca45c1aff740e12d47199abcf9dc883d570ec2",
+      "size": 1095
+    },
+    {
+      "path": "release/verify-release.ts",
+      "sha256": "7eff1a6672f096def3070d89c6be2ab2eb73ba6e28c198a6a05b459d8a99ab6b",
+      "size": 2864
+    }
+  ],
+  "signature": null
+}

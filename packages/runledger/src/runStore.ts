@@ -1,13 +1,13 @@
 import { randomUUID } from 'node:crypto';
 
 import {
-  asInvariantId,
   asRunId,
   asSpanId,
   type InvariantId,
   type InvariantLink,
   type RunId,
   type RunRecord,
+  type RunSnapshot,
   type SpanId,
   type SpanRecord,
 } from './models.js';
@@ -51,7 +51,7 @@ export class RunStore {
     const record: RunRecord = {
       runId,
       startedAt: new Date().toISOString(),
-      metadata: options.metadata,
+      metadata: options.metadata ? structuredClone(options.metadata) : undefined,
     };
     this.runs.set(runId, record);
     return structuredClone(record);
@@ -99,6 +99,7 @@ export class RunStore {
       name: options.name,
       startedAt: new Date().toISOString(),
       parentSpanId: options.parentSpanId,
+      metadata: options.metadata ? structuredClone(options.metadata) : undefined,
       invariantIds: [],
     };
     this.spans.set(spanId, record);
@@ -153,6 +154,22 @@ export class RunStore {
         .map((link) => structuredClone(link));
     }
     return this.invariantLinks.map((link) => structuredClone(link));
+  }
+
+  getRunSnapshot(runId: RunId): RunSnapshot | undefined {
+    const run = this.runs.get(runId);
+    if (!run) {
+      return undefined;
+    }
+
+    const spans = this.getSpansByRun(runId);
+    const invariantLinks = spans.flatMap((span) => this.getInvariantLinks(span.spanId));
+
+    return {
+      run: structuredClone(run),
+      spans,
+      invariantLinks,
+    };
   }
 
   private requireRun(runId: RunId): RunRecord {
