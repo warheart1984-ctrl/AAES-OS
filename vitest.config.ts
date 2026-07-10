@@ -39,7 +39,10 @@ export default defineConfig({
       '@aaes-os/platform-mesh': path.join(rootDir, 'packages/platform-mesh/src/index.ts'),
       '@aaes-os/psom-mesh': path.join(rootDir, 'packages/psom-mesh/src/index.ts'),
       '@aaes-os/sgce': path.join(rootDir, 'packages/sgce/src/index.ts'),
+      '@aaes-os/operator-config': path.join(rootDir, 'packages/operator-config/src/index.ts'),
       '@aaes-os/platform-sdk': path.join(rootDir, 'packages/platform-sdk/src/index.ts'),
+      '@aaes-os/aais': path.join(rootDir, 'packages/aais/src/index.ts'),
+      '@aaes-os/sovereignx-router': path.join(rootDir, 'packages/sovereignx-router/src/index.ts'),
     },
   },
   test: {

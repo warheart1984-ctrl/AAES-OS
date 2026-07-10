@@ -1,13 +1,18 @@
 import express from 'express';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { DriftMetrics } from '@aaes-os/aaes-governance';
+import { DriftMetrics, type ProofSurface } from '@aaes-os/aaes-governance';
 import {
   createDemoProofSurfaceRegistry,
+  createConstitutionalEvidenceGraphFromProofSurfaces,
   createProofSurfaceCatalogDocument,
   listProofSurfaceSummaries,
+  resolveConstitutionalEvidenceGraphFromReleaseReceipt,
+  summarizeConstitutionalEvidenceGraph,
+  type ConstitutionalEvidenceGraph,
+  type ConstitutionalReleaseReceipt,
 } from '@aaes-os/aaes-governance';
 import { createCenDemoResult, type EnforcementReceipt } from '@aaes-os/constitutional-enforcement-node';
 import {
@@ -24,7 +29,12 @@ import {
   appendSovereigntyEntry,
   createSovereigntyLedger,
 } from '@aaes-os/sovereignty-ledger';
+import {
+  createSovereignXScaffold,
+  type SovereignXExecutionProofSurface,
+} from '@aaes-os/sovereignx-router';
 
+import { createArenaModeSnapshot } from './arenaMode.js';
 import {
   approvePatch,
   deployPatch,
@@ -50,6 +60,7 @@ import { SubstrateAdapter } from './SubstrateAdapter.js';
 const PORT = Number(process.env.PORT ?? 4000);
 const serviceDir = path.dirname(fileURLToPath(import.meta.url));
 const clientDistDir = path.resolve(serviceDir, '..', 'dist', 'client');
+const releaseReceiptPath = path.resolve(serviceDir, '..', '..', '..', 'release', 'constitutional-release-receipt.json');
 
 ensureTelemetrySeeded();
 
@@ -85,7 +96,235 @@ const runtimeAdapter = new RuntimeAdapter(() => false);
 const substrateAdapter = new SubstrateAdapter(() => false);
 
 const app = express();
+const sovereignxRouterProofSurface: ProofSurface = {
+  identity: {
+    id: '@aaes-os/sovereignx-router',
+    name: 'SovereignX Router',
+    type: 'implementation',
+    version: '0.1.0',
+  },
+  purpose: 'Route governed compute work across CPU and GPU under CIEMS constraints.',
+  claims: [
+    {
+      id: 'ops-router-cpu-governs-gpu',
+      type: 'Architectural',
+      statement: 'CPU governs scheduling, continuity, and policy while GPU receives only allowed workloads.',
+      evidenceIds: ['ops-router-evidence-tests', 'ops-router-evidence-surface'],
+      proofLevel: 'P2',
+      verificationStatus: 'Implemented',
+      replayStatus: 'Replayable',
+      operationalStatus: 'Verified Prototype',
+    },
+    {
+      id: 'ops-router-ciems-policy',
+      type: 'Specification',
+      statement: 'CIEMS decisions can throttle, quarantine, kill, or allow governed compute tasks.',
+      evidenceIds: ['ops-router-evidence-tests'],
+      proofLevel: 'P2',
+      verificationStatus: 'Implemented',
+      replayStatus: 'Replayable',
+      operationalStatus: 'Verified Prototype',
+    },
+  ],
+  evidence: [
+    {
+      id: 'ops-router-evidence-tests',
+      statement: 'Router tests exercise CPU/GPU fallback, throttling, quarantine, and proof-surface validation.',
+      proofLevel: 'P2',
+      verificationStatus: 'Test Verified',
+      replayable: true,
+      verifiedBy: 'services/ops-console/src/server.test.ts',
+    },
+    {
+      id: 'ops-router-evidence-surface',
+      statement: 'Proof surface records are machine-readable and published through the operator catalog.',
+      proofLevel: 'P2',
+      verificationStatus: 'Implemented',
+      replayable: true,
+      verifiedBy: 'services/ops-console/src/server.ts',
+    },
+  ],
+  verificationStatus: 'Implemented',
+  proofLevel: 'P2',
+  replayStatus: 'Replayable',
+  operationalStatus: 'Verified Prototype',
+  truthBoundary: 'Proves governed routing and policy evaluation, not production-scale cluster orchestration.',
+  constitutionalProfile: {
+    purpose: 'Govern CPU vs GPU dispatch under constitutional constraints.',
+    authority: 'AAES governance law, proof-surface law, and CIEMS policy contracts.',
+    evidenceModel: 'Routing decisions, CIEMS decisions, evidence records, and tests.',
+    verificationProcess: 'Build, test, replay the router decisions, and validate the proof surface.',
+    complianceRequirements: ['No claim may exceed evidence', 'CPU governs policy', 'GPU remains an accelerator'],
+    truthBoundary: 'This package proves governed routing, not full cluster management.',
+    constitutionalScope: 'Compute routing, governance enforcement, and measurement health.',
+    constitutionalLimits: 'It does not claim full hardware management or multi-node scheduling.',
+    dependencies: ['local proof surface law'],
+    stewardship: 'AAES-OS governance maintainers',
+    replayPath: 'Replay the evidence log and routing decisions from the router history.',
+    failurePath: 'Throttle, quarantine, delay, or drop work when invariants fail.',
+    currentMaturity: 'Verified Prototype',
+  },
+  blindspots: ['No multi-node orchestration yet', 'No real GPU telemetry adapter yet', 'No thermal sensor integration yet'],
+  battleScars: ['Router ideas can overclaim before telemetry exists', 'Policy and acceleration layers can be confused without a proof surface'],
+  adversarialClaims: [
+    'An attacker could claim GPU work was routed safely without evidence',
+    'A stale measurement feed could be mistaken for trustworthy telemetry',
+  ],
+  colorTeamReadiness: {
+    redTeam: 'Attack surface is bounded by explicit routing decisions and evidence records.',
+    blueTeam: 'Policy decisions are logged, but real hardware telemetry is still stubbed.',
+    purpleTeam: 'Combined attack/defense tests are possible through deterministic router evaluation.',
+    greenTeam: 'Build and test are expected to be stable within the workspace package.',
+    yellowTeam: 'Operator messaging is clear, but the package is still a prototype.',
+    whiteTeam: 'Constitutional authority is explicit and machine-readable.',
+  },
+  commercialReadiness: {
+    targetTier: 'Builder',
+    intendedCustomer: 'Developers and platform operators building governed compute runtimes.',
+    primaryUseCase: 'Resource fairness and constitutional routing for agentic workloads.',
+    valueProposition: 'Makes CPU policy and GPU acceleration auditable and governable.',
+    currentReadiness: 'Prototype',
+  },
+  nextRequiredEvidence: ['Hardware telemetry adapter', 'Multi-node cluster routing', 'Soak and chaos tests'],
+};
 const proofSurfaceRegistry = createDemoProofSurfaceRegistry();
+proofSurfaceRegistry.publish(sovereignxRouterProofSurface);
+
+const sovereignxExecutionScaffold = createSovereignXScaffold({
+  applicationName: 'ops-console-sovereignx',
+});
+sovereignxExecutionScaffold.initialize();
+sovereignxExecutionScaffold.waitIdle();
+sovereignxExecutionScaffold.shutdown();
+
+const sovereignxExecutionProofSurfaces = sovereignxExecutionScaffold
+  .listProofSurfaces()
+  .filter((surface): surface is SovereignXExecutionProofSurface => surface.kind === 'execution');
+
+for (const executionSurface of sovereignxExecutionProofSurfaces) {
+  proofSurfaceRegistry.publish(mapSovereignXExecutionSurface(executionSurface));
+}
+
+function loadConstitutionalReleaseReceipt(): ConstitutionalReleaseReceipt | null {
+  if (!existsSync(releaseReceiptPath)) {
+    return null;
+  }
+  try {
+    return JSON.parse(readFileSync(releaseReceiptPath, 'utf8')) as ConstitutionalReleaseReceipt;
+  } catch {
+    return null;
+  }
+}
+
+function mapSovereignXExecutionSurface(surface: SovereignXExecutionProofSurface): ProofSurface {
+  const evidenceById = new Map(
+    surface.evidenceIds.map((evidenceId, index) => [
+      evidenceId,
+      {
+        id: evidenceId,
+        statement: index === 0
+          ? `Execution receipt ${evidenceId} proves ${surface.executionContract.operation}.`
+          : `Routed evidence ${evidenceId} supports ${surface.executionContract.operation}.`,
+        proofLevel: surface.proofLevel,
+        verificationStatus: surface.verificationStatus,
+        replayable: true,
+        verifiedBy: 'packages/sovereignx-router/src/scaffold.ts',
+      },
+    ] as const),
+  );
+
+  return {
+    identity: {
+      id: `@aaes-os/${surface.id}`,
+      name: `SovereignX Execution: ${surface.executionContract.operation}`,
+      type: 'runtime',
+      version: surface.sourceId,
+    },
+    purpose: `Expose governed SovereignX execution evidence for ${surface.executionContract.operation}.`,
+    claims: [
+      {
+        id: `${surface.id}-claim`,
+        type: 'Verification',
+        statement: surface.executionContract.evidence.summary,
+        evidenceIds: [...evidenceById.keys()],
+        proofLevel: surface.proofLevel,
+        verificationStatus: surface.verificationStatus,
+        replayStatus: surface.replayStatus,
+        operationalStatus: surface.operationalStatus,
+      },
+    ],
+    evidence: [...evidenceById.values()],
+    verificationStatus: surface.verificationStatus,
+    proofLevel: surface.proofLevel,
+    replayStatus: surface.replayStatus,
+    operationalStatus: surface.operationalStatus,
+    truthBoundary: surface.executionContract.truthBoundary,
+    constitutionalProfile: {
+      purpose: `Governed execution evidence for ${surface.executionContract.operation}.`,
+      authority: surface.executionContract.authority,
+      evidenceModel: surface.executionContract.evidence.artifacts.join(', '),
+      verificationProcess: surface.executionContract.verification.method,
+      complianceRequirements: surface.executionContract.compliance.requirements,
+      truthBoundary: surface.executionContract.truthBoundary,
+      constitutionalScope: 'SovereignX execution receipts, replayable evidence, and operator-visible proof surfaces.',
+      constitutionalLimits: 'Does not claim full cluster orchestration or external GPU hardware validation.',
+      dependencies: ['@aaes-os/sovereignx-router'],
+      stewardship: 'SovereignX maintainers and ops-console operators',
+      replayPath: surface.executionContract.verification.method,
+      failurePath: 'Reject execution surfaces without receipts, route evidence, or compliance.',
+      currentMaturity: surface.operationalStatus,
+    },
+    blindspots: [
+      'Execution surfaces are demo-generated from the local SovereignX scaffold.',
+      'No external GPU hardware telemetry is captured here yet.',
+    ],
+    battleScars: [
+      'Execution evidence used to live only inside generic receipts.',
+      'Operator views needed a first-class execution catalog entry.',
+    ],
+    adversarialClaims: [
+      'A receipt can be mistaken for proof without the execution proof surface.',
+      'A routed execution can be mistaken for full GPU orchestration.',
+    ],
+    colorTeamReadiness: {
+      redTeam: 'Execution evidence is visible and should be scrutinized for bypass paths.',
+      blueTeam: 'Receipts and route evidence remain machine-readable.',
+      purpleTeam: 'Execution claims and governance claims can be reconciled in the same catalog.',
+      greenTeam: 'Demo generation is deterministic within the local scaffold.',
+      yellowTeam: 'Truth boundaries are explicit for operator review.',
+      whiteTeam: 'Authority remains separated from presentation.',
+    },
+    commercialReadiness: {
+      targetTier: 'Builder',
+      intendedCustomer: 'Operators and governance teams',
+      primaryUseCase: 'Execution-proof visibility alongside governance proof surfaces',
+      valueProposition: 'A single catalog for receipt-backed execution and governance evidence.',
+      currentReadiness: 'Prototype',
+    },
+    nextRequiredEvidence: [
+      'Live GPU-backed execution path',
+      'External replay consumer',
+      'Operator drill against catalog-published execution receipts',
+    ],
+  };
+}
+
+function buildEvidenceGraph(): ConstitutionalEvidenceGraph {
+  const receipt = loadConstitutionalReleaseReceipt();
+  const surfaces = proofSurfaceRegistry.list();
+
+  if (receipt) {
+    return resolveConstitutionalEvidenceGraphFromReleaseReceipt(receipt, surfaces, {
+      source: 'release-receipt',
+    });
+  }
+
+  return createConstitutionalEvidenceGraphFromProofSurfaces(surfaces, {
+    source: 'local-registry',
+  });
+}
+
+const evidenceGraph = buildEvidenceGraph();
 app.use((req, res, next) => {
   const requestId = req.header('x-request-id') ?? `req-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
   res.setHeader('x-request-id', requestId);
@@ -136,6 +375,7 @@ app.get('/telemetry', async (_req, res) => {
     patchTimeline: patchAnalytics.getTimeline(),
     cab: getCabTelemetrySummary(),
     aais,
+    evidenceGraph: summarizeConstitutionalEvidenceGraph(evidenceGraph),
     proofSurfaces: listProofSurfaceSummaries(proofSurfaceRegistry),
   });
 });
@@ -147,6 +387,15 @@ app.get('/proof-surfaces', (_req, res) => {
     records,
     summaries: listProofSurfaceSummaries(proofSurfaceRegistry),
   });
+});
+
+app.get('/constitutional-release-receipt', (_req, res) => {
+  const receipt = evidenceGraph.rootReceipt;
+  res.json({ receipt });
+});
+
+app.get('/evidence-graph', (_req, res) => {
+  res.json({ graph: evidenceGraph, summary: summarizeConstitutionalEvidenceGraph(evidenceGraph) });
 });
 
 app.get('/governance', (_req, res) => {
@@ -257,6 +506,10 @@ app.get('/meta/law-of-laws', (_req, res) => {
 
 app.get('/patches', (_req, res) => {
   res.json({ patches: listPatches() });
+});
+
+app.get('/arena', (_req, res) => {
+  res.json(createArenaModeSnapshot());
 });
 
 app.post('/patches/:patchId/approve', (req, res) => {

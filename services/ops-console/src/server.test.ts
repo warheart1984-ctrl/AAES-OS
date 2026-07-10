@@ -67,12 +67,68 @@ describe('GET /telemetry', () => {
     const body = (await response.json()) as {
       catalog: { schemaVersion: string; surfaces: unknown[] };
       records: unknown[];
-      summaries: { identity: { id: string }; proofLevel: string }[];
+      summaries: { identity: { id: string }; proofLevel: string; domain: string; healthIndicator: string }[];
     };
 
     expect(body.catalog.schemaVersion).toBe('1.0');
     expect(body.records.length).toBeGreaterThan(0);
-    expect(body.summaries.some((surface) => surface.identity.id === '@aaes-os/aaes-governance')).toBe(true);
+    expect(body.summaries.some((surface) => surface.identity.id === '@aaes-os/aaes-governance' && surface.domain === 'Governance')).toBe(true);
+    expect(body.summaries.some((surface) => surface.identity.id === '@aaes-os/sovereignx-router' && surface.domain === 'Execution')).toBe(true);
+    expect(body.summaries.every((surface) => typeof surface.healthIndicator === 'string')).toBe(true);
+  });
+
+  it('returns the constitutional evidence graph rooted in the release receipt', async () => {
+    const response = await fetch(`${baseUrl}/evidence-graph`);
+    expect(response.status).toBe(200);
+
+    const body = (await response.json()) as {
+      summary: { rootReceiptId: string; proofSurfaceCount: number; claimCount: number; unresolvedClaims: string[] };
+      graph: { rootReceipt: { receiptId: string }; claims: unknown[] };
+    };
+
+    expect(body.summary.rootReceiptId).toBe(body.graph.rootReceipt.receiptId);
+    expect(body.summary.proofSurfaceCount).toBeGreaterThan(0);
+    expect(body.summary.claimCount).toBeGreaterThan(0);
+    expect(body.summary.unresolvedClaims).toHaveLength(0);
+  });
+
+  it('returns the arena mode snapshot for the tournament console', async () => {
+    const response = await fetch(`${baseUrl}/arena`);
+    expect(response.status).toBe(200);
+    expect(response.headers.get('content-type')).toContain('application/json');
+
+    const body = (await response.json()) as {
+      arenaId: string;
+      map: { width: number; height: number; terrainGrid: string[][] };
+      agents: { name: string; faction: string; talents: { name: string }[] }[];
+      challengeRuns: { runId: string; status: string; proofLevel: string; timeline: unknown[] }[];
+      scorecard: { proofLevel: string; readinessLevel: string; challengePassRate: number };
+      lifecycle: { stage: string; status: string; artifacts: string[] }[];
+      certificate: { certificateId: string; readinessLevel: string; challengeResults: string };
+      tournament: { tournamentId: string; rounds: { matchId: string; winner: string | null; tracePath: string | null }[][] };
+      replayReports: Record<string, { integrityScore: number; tracePath: string }>;
+      battleScars: { scarId: string; type: string }[];
+      digitalThread: string[];
+    };
+
+    expect(body.arenaId).toMatch(/^arena-/);
+    expect(body.map.width).toBeGreaterThan(0);
+    expect(body.map.height).toBeGreaterThan(0);
+    expect(body.map.terrainGrid).toHaveLength(body.map.height);
+    expect(body.agents.length).toBeGreaterThan(0);
+    expect(body.agents.every((agent) => agent.talents.length > 0)).toBe(true);
+    expect(body.challengeRuns.length).toBeGreaterThan(0);
+    expect(body.challengeRuns.every((run) => Array.isArray(run.timeline) && run.timeline.length > 0)).toBe(true);
+    expect(body.scorecard.proofLevel).toMatch(/^P[0-5]$/);
+    expect(body.scorecard.readinessLevel).toMatch(/prototype|candidate|production-ready/);
+    expect(body.lifecycle.map((phase) => phase.stage)).toEqual(['Design', 'Build', 'Verify', 'Challenge', 'Certify', 'Release', 'Observe', 'Learn']);
+    expect(body.certificate.certificateId).toMatch(/^certificate-/);
+    expect(body.certificate.challengeResults).toContain('challenges');
+    expect(body.tournament.rounds.length).toBeGreaterThan(0);
+    expect(Object.keys(body.replayReports).length).toBeGreaterThan(0);
+    expect(Object.values(body.replayReports).every((report) => report.integrityScore >= 0 && report.integrityScore <= 100)).toBe(true);
+    expect(body.battleScars.length).toBeGreaterThan(0);
+    expect(body.digitalThread.length).toBeGreaterThan(0);
   });
 
   it('allows the studio to fetch proof surfaces cross-origin', async () => {

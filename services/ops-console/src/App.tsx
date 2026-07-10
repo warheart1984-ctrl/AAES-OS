@@ -1,6 +1,8 @@
 import React, { useEffect, useState, type FormEvent } from 'react';
 
-import type { ProofSurfaceSummary } from '@aaes-os/aaes-governance';
+import type { ConstitutionalEvidenceGraphSummary, ProofSurfaceSummary } from '@aaes-os/aaes-governance';
+import { ArenaModePanel } from './ArenaModePanel.js';
+import { createArenaModeSnapshot, type ArenaSnapshot } from './arenaMode.js';
 import { PatchApprovals } from './PatchApprovals.js';
 import {
   DEFAULT_PROOF_SURFACE_CATALOG_URL,
@@ -73,6 +75,7 @@ type TelemetryResponse = {
       reconstructionPlans: string[];
     };
   };
+  evidenceGraph?: ConstitutionalEvidenceGraphSummary;
 };
 
 type ScoreVector = {
@@ -155,6 +158,8 @@ export const App: React.FC = () => {
     };
   });
   const [catalogUrlInput, setCatalogUrlInput] = useState(proofSurfaceCatalog.catalogUrl);
+  const [selectedProofSurfaceId, setSelectedProofSurfaceId] = useState<string | null>(null);
+  const [arenaMode, setArenaMode] = useState<ArenaSnapshot>(() => createArenaModeSnapshot());
 
   useEffect(() => {
     const fetchTelemetry = async () => {
@@ -185,6 +190,29 @@ export const App: React.FC = () => {
     fetchTelemetry();
     const id = setInterval(fetchTelemetry, 5000);
     return () => clearInterval(id);
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    const fetchArena = async () => {
+      try {
+        const response = await fetch('/arena');
+        if (!response.ok) {
+          return;
+        }
+        const arena = (await response.json()) as ArenaSnapshot;
+        if (!cancelled) {
+          setArenaMode(arena);
+        }
+      } catch {
+        // Fall back to the seeded local arena snapshot.
+      }
+    };
+
+    void fetchArena();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   useEffect(() => {
@@ -244,6 +272,20 @@ export const App: React.FC = () => {
     };
   }, [proofSurfaceCatalog.catalogUrl]);
 
+  useEffect(() => {
+    if (proofSurfaceCatalog.status !== 'loaded' || proofSurfaceCatalog.proofSurfaces.length === 0) {
+      return;
+    }
+
+    const selectedSurfaceStillExists = selectedProofSurfaceId
+      ? proofSurfaceCatalog.proofSurfaces.some((surface) => surface.identity.id === selectedProofSurfaceId)
+      : false;
+
+    if (!selectedSurfaceStillExists) {
+      setSelectedProofSurfaceId(proofSurfaceCatalog.proofSurfaces[0].identity.id);
+    }
+  }, [proofSurfaceCatalog.proofSurfaces, proofSurfaceCatalog.status, selectedProofSurfaceId]);
+
   const applyCatalogUrl = (nextCatalogUrl: string) => {
     const normalizedCatalogUrl = normalizeProofSurfaceCatalogUrl(nextCatalogUrl);
     setCatalogUrlInput(normalizedCatalogUrl);
@@ -285,10 +327,13 @@ export const App: React.FC = () => {
       meta={state.meta}
       proofSurfaceCatalog={proofSurfaceCatalog}
       catalogUrlInput={catalogUrlInput}
+      selectedProofSurfaceId={selectedProofSurfaceId}
       onCatalogUrlInputChange={setCatalogUrlInput}
       onCatalogSubmit={handleCatalogSubmit}
       onResetCatalogUrl={resetCatalogUrl}
       onUseQueryCatalogUrl={useCatalogFromQuery}
+      onSelectedProofSurfaceChange={setSelectedProofSurfaceId}
+      arenaMode={arenaMode}
     />
   );
 };
@@ -296,10 +341,13 @@ export const App: React.FC = () => {
 type OpsConsoleShellProps = LoadedState & {
   proofSurfaceCatalog: ProofSurfaceCatalogState;
   catalogUrlInput: string;
+  selectedProofSurfaceId: string | null;
   onCatalogUrlInputChange: (value: string) => void;
   onCatalogSubmit: (event: FormEvent<HTMLFormElement>) => void;
   onResetCatalogUrl: () => void;
   onUseQueryCatalogUrl: () => void;
+  onSelectedProofSurfaceChange: (value: string) => void;
+  arenaMode: ArenaSnapshot;
 };
 
 export const OpsConsoleShell: React.FC<OpsConsoleShellProps> = ({
@@ -309,25 +357,29 @@ export const OpsConsoleShell: React.FC<OpsConsoleShellProps> = ({
   meta,
   proofSurfaceCatalog,
   catalogUrlInput,
+  selectedProofSurfaceId,
   onCatalogUrlInputChange,
   onCatalogSubmit,
   onResetCatalogUrl,
   onUseQueryCatalogUrl,
+  onSelectedProofSurfaceChange,
+  arenaMode,
 }) => (
   <div style={{ fontFamily: 'system-ui', padding: 16, color: '#172026', background: '#f6f7f9' }}>
     <h1 style={{ margin: '0 0 16px' }}>AAES-OS Ops Console</h1>
     <nav style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
-      <a href="#catalog">Proof Surface Catalog</a>
+      <a href="#catalog">Constitutional Knowledge Graph</a>
       <a href="#mri">MRI Cockpit</a>
       <a href="#enforcement">Enforcement Dashboard</a>
       <a href="#meta">Meta-Constitutional Console</a>
+      <a href="#arena">Arena Mode</a>
       <a href="#aais">AAIS Runtime</a>
       <a href="#cab">CAB Continuity</a>
     </nav>
 
     <section id="catalog" style={sectionStyle}>
-      <h2>Proof Surface Catalog</h2>
-      <p>Point the Ops Console at any proof-surface backend without changing code.</p>
+      <h2>Constitutional Knowledge Graph</h2>
+      <p>Point the Ops Console at any proof-surface backend and explore surfaces by domain, health, and constitutional profile.</p>
       <form onSubmit={onCatalogSubmit} style={{ display: 'grid', gap: 12, marginBottom: 12 }}>
         <label style={{ display: 'grid', gap: 6 }}>
           <span style={{ fontSize: 13, fontWeight: 600 }}>Catalog URL</span>
@@ -356,11 +408,25 @@ export const OpsConsoleShell: React.FC<OpsConsoleShellProps> = ({
         <div>Status: {proofSurfaceCatalog.status}</div>
         {proofSurfaceCatalog.error ? <div>Error: {proofSurfaceCatalog.error}</div> : null}
       </div>
+      <ProofSurfaceKnowledgeGraph
+        surfaces={proofSurfaceCatalog.proofSurfaces}
+        selectedProofSurfaceId={selectedProofSurfaceId}
+        onSelectedProofSurfaceChange={onSelectedProofSurfaceChange}
+      />
+    </section>
+
+    <section style={sectionStyle}>
+      <h2>Constitutional Evidence Graph</h2>
+      <p>The evidence graph resolves the release receipt into the proof-surface and public-view nodes used by every operator surface.</p>
       <div style={gridStyle}>
-        {proofSurfaceCatalog.proofSurfaces.map((surface) => (
-          <ProofSurfaceCard key={surface.identity.id} surface={surface} />
-        ))}
+        <Metric label="Graph ID" value={telemetry.evidenceGraph?.graphId ?? 'loading'} />
+        <Metric label="Root Receipt" value={telemetry.evidenceGraph?.rootReceiptId ?? 'loading'} />
+        <Metric label="Claims" value={String(telemetry.evidenceGraph?.claimCount ?? 0)} />
+        <Metric label="Unresolved" value={String(telemetry.evidenceGraph?.unresolvedClaims.length ?? 0)} />
       </div>
+      <p style={{ marginBottom: 0, color: '#5f6b7a' }}>
+        Public claims resolve through the same evidence graph before they appear in dashboards or docs.
+      </p>
     </section>
 
     <OpsConsoleView
@@ -368,11 +434,12 @@ export const OpsConsoleShell: React.FC<OpsConsoleShellProps> = ({
       mriV2={mriV2}
       enforcement={enforcement}
       meta={meta}
+      arenaMode={arenaMode}
     />
   </div>
 );
 
-export const OpsConsoleView: React.FC<LoadedState> = ({ telemetry, mriV2, enforcement, meta }) => (
+export const OpsConsoleView: React.FC<LoadedState & { arenaMode: ArenaSnapshot }> = ({ telemetry, mriV2, enforcement, meta, arenaMode }) => (
   <div>
     <section id="mri" style={sectionStyle}>
       <h2>MRI Cockpit</h2>
@@ -403,6 +470,11 @@ export const OpsConsoleView: React.FC<LoadedState> = ({ telemetry, mriV2, enforc
         <Panel title="Evidence Ledger">
           <p>Mean confidence {mriV2.evidence.meanConfidence.toFixed(3)}</p>
           <p>Before {mriV2.evidence.beforeConfidence} | After {mriV2.evidence.afterConfidence}</p>
+        </Panel>
+        <Panel title="Evidence Graph">
+          <p>Root receipt {telemetry.evidenceGraph?.rootReceiptId ?? 'loading'}</p>
+          <p>Verified claims {telemetry.evidenceGraph?.verifiedClaimCount ?? 0}</p>
+          <p>Views {telemetry.evidenceGraph?.viewCount ?? 0}</p>
         </Panel>
       </div>
     </section>
@@ -480,6 +552,8 @@ export const OpsConsoleView: React.FC<LoadedState> = ({ telemetry, mriV2, enforc
       </div>
     </section>
 
+    <ArenaModePanel arena={arenaMode} />
+
     <section style={sectionStyle}>
       <h2>Top Patterns</h2>
       <table>
@@ -507,7 +581,9 @@ function isProofSurfaceSummary(value: unknown): value is ProofSurfaceSummary {
       typeof value === 'object' &&
       'identity' in value &&
       'proofLevel' in value &&
-      'commercialReadiness' in value,
+      'commercialReadiness' in value &&
+      'domain' in value &&
+      'healthIndicator' in value,
   );
 }
 
@@ -539,6 +615,171 @@ const gridStyle: React.CSSProperties = {
   display: 'grid',
   gap: 12,
   gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+};
+
+const groupSectionStyle: React.CSSProperties = {
+  display: 'grid',
+  gap: 12,
+};
+
+const groupHeaderStyle: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  gap: 12,
+};
+
+const graphPillStyle: React.CSSProperties = {
+  border: '1px solid #c8d4e3',
+  borderRadius: 999,
+  padding: '6px 12px',
+  background: '#eef4ff',
+  color: '#23405f',
+  fontSize: 12,
+  fontWeight: 700,
+  letterSpacing: '0.06em',
+  textTransform: 'uppercase',
+};
+
+const domainGridStyle: React.CSSProperties = {
+  display: 'grid',
+  gap: 12,
+  gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+};
+
+const proofSurfaceCardStyle: React.CSSProperties = {
+  appearance: 'none',
+  border: '1px solid #d9e0ea',
+  borderRadius: 14,
+  padding: 14,
+  background: '#ffffff',
+  textAlign: 'left',
+  cursor: 'pointer',
+  display: 'grid',
+  gap: 8,
+};
+
+const proofSurfaceCardHeaderStyle: React.CSSProperties = {
+  display: 'flex',
+  flexWrap: 'wrap',
+  gap: 8,
+  justifyContent: 'space-between',
+  alignItems: 'center',
+};
+
+const proofSurfaceBadgeStyle: React.CSSProperties = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  borderRadius: 999,
+  padding: '4px 10px',
+  fontSize: 11,
+  fontWeight: 700,
+  letterSpacing: '0.06em',
+  textTransform: 'uppercase',
+};
+
+const domainBadgeStyles: Record<ProofSurfaceSummary['domain'], React.CSSProperties> = {
+  Governance: { background: '#eef4ff', color: '#23405f' },
+  Execution: { background: '#f2e8ff', color: '#5b21b6' },
+  Runtime: { background: '#e8fff4', color: '#0f766e' },
+  Intent: { background: '#fff4e8', color: '#9a3412' },
+  Evidence: { background: '#f0f9ff', color: '#0369a1' },
+  Verification: { background: '#ecfeff', color: '#155e75' },
+  Replay: { background: '#f5f3ff', color: '#6d28d9' },
+  Audit: { background: '#fdf2f8', color: '#be185d' },
+  Interoperability: { background: '#f8fafc', color: '#475569' },
+};
+
+const healthBadgeStyles: Record<ProofSurfaceSummary['healthIndicator'], React.CSSProperties> = {
+  Verified: { background: '#e7f7ef', color: '#146c43' },
+  Experimental: { background: '#fff4d6', color: '#9a6700' },
+  Simulated: { background: '#f1f5f9', color: '#475569' },
+  Operational: { background: '#e0f2fe', color: '#075985' },
+  'Commercially Available': { background: '#f3e8ff', color: '#6b21a8' },
+};
+
+const proofSurfaceCardTitleStyle: React.CSSProperties = {
+  fontSize: 18,
+  fontWeight: 800,
+  color: '#172026',
+};
+
+const proofSurfaceCardIdentityStyle: React.CSSProperties = {
+  fontSize: 12,
+  color: '#5f6b7a',
+  fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
+};
+
+const proofSurfaceCardMetaStyle: React.CSSProperties = {
+  display: 'flex',
+  flexWrap: 'wrap',
+  gap: 10,
+  fontSize: 12,
+  color: '#334155',
+  fontWeight: 600,
+};
+
+const proofSurfaceCardSummaryStyle: React.CSSProperties = {
+  color: '#172026',
+  lineHeight: 1.5,
+};
+
+const proofSurfaceCardFooterStyle: React.CSSProperties = {
+  color: '#5f6b7a',
+  fontSize: 13,
+  lineHeight: 1.5,
+};
+
+const profilePanelStyle: React.CSSProperties = {
+  border: '1px solid #c9d5e4',
+  borderRadius: 16,
+  padding: 16,
+  background: '#f8fbff',
+  display: 'grid',
+  gap: 16,
+};
+
+const profileHeaderStyle: React.CSSProperties = {
+  display: 'flex',
+  justifyContent: 'space-between',
+  gap: 16,
+  alignItems: 'start',
+};
+
+const profileEyebrowStyle: React.CSSProperties = {
+  color: '#23405f',
+  textTransform: 'uppercase',
+  letterSpacing: '0.12em',
+  fontSize: 11,
+  fontWeight: 800,
+};
+
+const profileIdentityStyle: React.CSSProperties = {
+  color: '#5f6b7a',
+  fontSize: 12,
+  fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
+};
+
+const profileLeadStyle: React.CSSProperties = {
+  margin: 0,
+  color: '#334155',
+  lineHeight: 1.6,
+};
+
+const profileTwoColumnStyle: React.CSSProperties = {
+  display: 'grid',
+  gap: 12,
+  gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+};
+
+const relatedSurfaceLinkStyle: React.CSSProperties = {
+  border: 0,
+  background: 'transparent',
+  color: '#1d4ed8',
+  padding: 0,
+  cursor: 'pointer',
+  font: 'inherit',
+  textAlign: 'left',
 };
 
 const Panel: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (
@@ -574,21 +815,268 @@ const BenchmarkCard: React.FC<{
   </div>
 );
 
-const ProofSurfaceCard: React.FC<{ surface: ProofSurfaceSummary }> = ({ surface }) => (
-  <div style={{ border: '1px solid #e3e7ed', borderRadius: 6, padding: 12 }}>
-    <div style={{ color: '#5f6b7a', fontSize: 12, textTransform: 'uppercase' }}>{surface.identity.type}</div>
-    <div style={{ fontSize: 18, fontWeight: 700 }}>{surface.identity.name}</div>
-    <p style={{ margin: '8px 0' }}>{surface.identity.id}</p>
-    <p>Proof level: {surface.proofLevel}</p>
-    <p>Verification: {surface.verificationStatus}</p>
-    <p>Replay: {surface.replayStatus}</p>
-    <p>Operational: {surface.operationalStatus}</p>
-    <p style={{ fontSize: 13, color: '#5f6b7a' }}>{surface.truthBoundary}</p>
-    <p style={{ fontSize: 13 }}>Maturity: {surface.currentMaturity}</p>
-    <p style={{ fontSize: 13 }}>Tier: {surface.commercialReadiness.targetTier}</p>
-    <p style={{ fontSize: 13 }}>Next: {surface.nextRequiredEvidence.join(', ')}</p>
-  </div>
+const PROOF_SURFACE_DOMAIN_ORDER: ProofSurfaceSummary['domain'][] = [
+  'Governance',
+  'Execution',
+  'Runtime',
+  'Intent',
+  'Evidence',
+  'Verification',
+  'Replay',
+  'Audit',
+  'Interoperability',
+];
+
+const ProofSurfaceKnowledgeGraph: React.FC<{
+  surfaces: ProofSurfaceSummary[];
+  selectedProofSurfaceId: string | null;
+  onSelectedProofSurfaceChange: (value: string) => void;
+}> = ({ surfaces, selectedProofSurfaceId, onSelectedProofSurfaceChange }) => {
+  const groupedSurfaces = groupProofSurfacesByDomain(surfaces);
+  const selectedSurface = findProofSurfaceById(surfaces, selectedProofSurfaceId) ?? surfaces[0];
+  const verifiedCount = surfaces.filter((surface) => surface.healthIndicator === 'Verified').length;
+  const operationalCount = surfaces.filter((surface) => surface.healthIndicator === 'Operational').length;
+  const simulatedCount = surfaces.filter((surface) => surface.healthIndicator === 'Simulated').length;
+  const commercialCount = surfaces.filter((surface) => surface.healthIndicator === 'Commercially Available').length;
+
+  return (
+    <div style={{ display: 'grid', gap: 16 }}>
+      <div style={gridStyle}>
+        <Metric label="Surfaces" value={String(surfaces.length)} />
+        <Metric label="Domains" value={String(groupedSurfaces.length)} />
+        <Metric label="Verified" value={String(verifiedCount)} />
+        <Metric label="Operational" value={String(operationalCount)} />
+        <Metric label="Simulated" value={String(simulatedCount)} />
+        <Metric label="Commercial" value={String(commercialCount)} />
+      </div>
+
+      {groupedSurfaces.map((group) => (
+        <section key={group.domain} style={groupSectionStyle}>
+          <div style={groupHeaderStyle}>
+            <div>
+              <h3 style={{ margin: 0 }}>{group.domain}</h3>
+              <p style={{ margin: '4px 0 0', color: '#5f6b7a', fontSize: 13 }}>
+                {group.surfaces.length} surface{group.surfaces.length === 1 ? '' : 's'}
+              </p>
+            </div>
+            <div style={graphPillStyle}>Constitutional knowledge graph</div>
+          </div>
+          <div style={domainGridStyle}>
+            {group.surfaces.map((surface) => (
+              <ProofSurfaceCard
+                key={surface.identity.id}
+                surface={surface}
+                selected={surface.identity.id === selectedSurface?.identity.id}
+                onSelect={onSelectedProofSurfaceChange}
+              />
+            ))}
+          </div>
+        </section>
+      ))}
+
+      {selectedSurface ? (
+        <ProofSurfaceProfilePanel
+          surface={selectedSurface}
+          surfaces={surfaces}
+          onSelectSurface={onSelectedProofSurfaceChange}
+        />
+      ) : null}
+
+      <RouterProofSurfaceCallout surfaces={surfaces} />
+    </div>
+  );
+};
+
+const ProofSurfaceCard: React.FC<{
+  surface: ProofSurfaceSummary;
+  selected: boolean;
+  onSelect: (value: string) => void;
+}> = ({ surface, selected, onSelect }) => (
+  <button
+    type="button"
+    onClick={() => onSelect(surface.identity.id)}
+    style={{
+      ...proofSurfaceCardStyle,
+      borderColor: selected ? '#1d4ed8' : '#d9e0ea',
+      boxShadow: selected ? '0 0 0 2px rgba(29, 78, 216, 0.12)' : 'none',
+    }}
+  >
+    <div style={proofSurfaceCardHeaderStyle}>
+      <span style={{ ...proofSurfaceBadgeStyle, ...domainBadgeStyles[surface.domain] }}>{surface.domain}</span>
+      <span style={{ ...proofSurfaceBadgeStyle, ...healthBadgeStyles[surface.healthIndicator] }}>{surface.healthIndicator}</span>
+    </div>
+    <div style={proofSurfaceCardTitleStyle}>{surface.identity.name}</div>
+    <div style={proofSurfaceCardIdentityStyle}>{surface.identity.id}</div>
+    <div style={proofSurfaceCardMetaStyle}>
+      <span>Proof {surface.proofLevel}</span>
+      <span>Maturity {surface.maturity}</span>
+      <span>Replay {surface.replayStatus}</span>
+    </div>
+    <div style={proofSurfaceCardSummaryStyle}>{surface.whatItProves}</div>
+    <div style={proofSurfaceCardFooterStyle}>{surface.truthBoundary}</div>
+  </button>
 );
+
+const ProofSurfaceProfilePanel: React.FC<{
+  surface: ProofSurfaceSummary;
+  surfaces: ProofSurfaceSummary[];
+  onSelectSurface: (value: string) => void;
+}> = ({ surface, surfaces, onSelectSurface }) => {
+  const relatedSurfaces = surface.relatedProofSurfaces
+    .map((relatedId) => findProofSurfaceById(surfaces, relatedId))
+    .filter((relatedSurface): relatedSurface is ProofSurfaceSummary => Boolean(relatedSurface));
+
+  return (
+    <div style={profilePanelStyle}>
+      <div style={profileHeaderStyle}>
+        <div>
+          <div style={profileEyebrowStyle}>{surface.domain}</div>
+          <h3 style={{ margin: '4px 0 0' }}>{surface.identity.name}</h3>
+          <div style={profileIdentityStyle}>{surface.identity.id}</div>
+        </div>
+        <div style={{ ...proofSurfaceBadgeStyle, ...healthBadgeStyles[surface.healthIndicator] }}>{surface.healthIndicator}</div>
+      </div>
+
+      <p style={profileLeadStyle}>{surface.whatItProves}</p>
+
+      <div style={gridStyle}>
+        <Metric label="Proof level" value={surface.proofLevel} />
+        <Metric label="Maturity" value={surface.maturity} />
+        <Metric label="Verification" value={surface.verificationStatus} />
+        <Metric label="Replay" value={surface.replayStatus} />
+      </div>
+
+      <div style={profileTwoColumnStyle}>
+        <Panel title="What it proves">
+          <p>{surface.whatItProves}</p>
+        </Panel>
+        <Panel title="What it does not prove">
+          <p>{surface.whatItDoesNotProve}</p>
+        </Panel>
+        <Panel title="Current evidence">
+          <ul>
+            {surface.currentEvidence.map((evidence) => (
+              <li key={evidence.id}>
+                <strong>{evidence.id}</strong>: {evidence.statement}
+              </li>
+            ))}
+          </ul>
+        </Panel>
+        <Panel title="Blindspots">
+          <ul>{surface.blindspots.map((item) => <li key={item}>{item}</li>)}</ul>
+        </Panel>
+        <Panel title="Known limitations">
+          <ul>{surface.knownLimitations.map((item) => <li key={item}>{item}</li>)}</ul>
+        </Panel>
+        <Panel title="Adversarial claims">
+          <ul>{surface.adversarialClaims.map((item) => <li key={item}>{item}</li>)}</ul>
+        </Panel>
+        <Panel title="Battle scars">
+          <ul>{surface.battleScars.map((item) => <li key={item}>{item}</li>)}</ul>
+        </Panel>
+        <Panel title="Dependencies">
+          <ul>{surface.dependencies.map((item) => <li key={item}>{item}</li>)}</ul>
+        </Panel>
+        <Panel title="Related proof surfaces">
+          {relatedSurfaces.length > 0 ? (
+            <ul>
+              {relatedSurfaces.map((relatedSurface) => (
+                <li key={relatedSurface.identity.id}>
+                  <button
+                    type="button"
+                    onClick={() => onSelectSurface(relatedSurface.identity.id)}
+                    style={relatedSurfaceLinkStyle}
+                  >
+                    {relatedSurface.identity.name} ({relatedSurface.domain})
+                  </button>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p>No related proof surfaces are currently linked in the graph.</p>
+          )}
+        </Panel>
+        <Panel title="Graph metadata">
+          <p><strong>Inputs:</strong> {surface.inputs.join(', ')}</p>
+          <p><strong>Outputs:</strong> {surface.outputs.join(', ')}</p>
+          <p><strong>Evidence receipts:</strong> {surface.evidenceReceipts.join(', ')}</p>
+          <p><strong>Replay path:</strong> {surface.replayPath}</p>
+          <p><strong>Verification path:</strong> {surface.verificationPath}</p>
+          <p><strong>Truth boundary:</strong> {surface.truthBoundary}</p>
+          <p><strong>Constitutional limits:</strong> {surface.constitutionalLimits}</p>
+        </Panel>
+      </div>
+    </div>
+  );
+};
+
+const RouterProofSurfaceCallout: React.FC<{ surfaces: ProofSurfaceSummary[] }> = ({ surfaces }) => {
+  const routerSurface = findRouterSurface(surfaces);
+  if (!routerSurface) {
+    return null;
+  }
+
+  return (
+    <div style={{ marginTop: 16, border: '1px solid #cad4e0', borderRadius: 8, padding: 16, background: '#f8fbff' }}>
+      <h3 style={{ marginTop: 0 }}>SovereignX Router</h3>
+      <p style={{ marginTop: 0 }}>
+        CPU governance handles planning, continuity, throttling, and invariants while GPU acceleration handles matmul,
+        attention, render passes, and physics.
+      </p>
+      <div style={gridStyle}>
+        <Metric label="Proof Level" value={routerSurface.proofLevel} />
+        <Metric label="Verification" value={routerSurface.verificationStatus} />
+        <Metric label="Replay" value={routerSurface.replayStatus} />
+        <Metric label="Operational" value={routerSurface.operationalStatus} />
+      </div>
+      <p style={{ marginBottom: 0, color: '#5f6b7a' }}>{routerSurface.truthBoundary}</p>
+      <p style={{ marginBottom: 0 }}>
+        Failure path: delay, throttle, quarantine, or drop governed work when invariants or CIEMS limits require it.
+      </p>
+    </div>
+  );
+};
+
+function groupProofSurfacesByDomain(surfaces: ProofSurfaceSummary[]): { domain: ProofSurfaceSummary['domain']; surfaces: ProofSurfaceSummary[] }[] {
+  const grouped = new Map<ProofSurfaceSummary['domain'], ProofSurfaceSummary[]>();
+  for (const surface of surfaces) {
+    const bucket = grouped.get(surface.domain) ?? [];
+    bucket.push(surface);
+    grouped.set(surface.domain, bucket);
+  }
+
+  return [
+    ...PROOF_SURFACE_DOMAIN_ORDER.filter((domain) => grouped.has(domain)).map((domain) => ({
+      domain,
+      surfaces: grouped.get(domain) ?? [],
+    })),
+    ...[...grouped.keys()]
+      .filter((domain) => !PROOF_SURFACE_DOMAIN_ORDER.includes(domain))
+      .sort()
+      .map((domain) => ({
+        domain,
+        surfaces: grouped.get(domain) ?? [],
+      })),
+  ];
+}
+
+function findProofSurfaceById(
+  surfaces: ProofSurfaceSummary[],
+  identity: string | null,
+): ProofSurfaceSummary | undefined {
+  if (!identity) {
+    return undefined;
+  }
+  return surfaces.find((surface) => surface.identity.id === identity);
+}
+
+function findRouterSurface(surfaces: ProofSurfaceSummary[]): ProofSurfaceSummary | undefined {
+  return surfaces.find((surface) =>
+    surface.identity.id === '@aaes-os/sovereignx-router' ||
+    surface.identity.name.toLowerCase().includes('sovereignx router') ||
+    surface.identity.name.toLowerCase().includes('sovereignxrouter'),
+  );
+}
 
 function markerStyle(value: number, color: string, size = 6): React.CSSProperties {
   return {

@@ -1,12 +1,66 @@
 import { renderToString } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 
-import { OpsConsoleView } from './App.js';
+import { OpsConsoleShell } from './App.js';
+import { createArenaModeSnapshot } from './arenaMode.js';
+import type { ProofSurfaceSummary } from '@aaes-os/aaes-governance';
+
+function buildProofSurfaceSummary(overrides: Partial<ProofSurfaceSummary> = {}): ProofSurfaceSummary {
+  return {
+    identity: {
+      id: '@aaes-os/aaes-governance',
+      name: 'AAES Governance Package',
+      type: 'repository',
+    },
+    domain: 'Governance',
+    healthIndicator: 'Verified',
+    proofLevel: 'P2',
+    maturity: 'Verified Prototype',
+    verificationStatus: 'Test Verified',
+    replayStatus: 'Replayable',
+    operationalStatus: 'Verified Prototype',
+    truthBoundary: 'The package does not certify external production systems.',
+    constitutionalLimits: 'Does not replace consumer-specific adapters or deployment pipelines.',
+    dependencies: ['runledger'],
+    inputs: ['gov-impl-evidence'],
+    outputs: ['The package implements proof-surface types, validation, and registry helpers.', 'gov-impl'],
+    evidenceReceipts: ['gov-impl-evidence'],
+    currentEvidence: [
+      {
+        id: 'gov-impl-evidence',
+        statement: 'Source files define ProofSurface, ProofSurfaceRegistry, and JSON helpers.',
+        proofLevel: 'P1',
+        verificationStatus: 'Implemented',
+        replayable: true,
+        verifiedBy: 'src/proofSurface.ts',
+      },
+    ],
+    replayPath: 'Replay from registry documents and validation output.',
+    verificationPath: 'Build, test, and schema serialization checks.',
+    whatItProves: 'Govern proof-surface claims across the stack.',
+    whatItDoesNotProve: 'The package does not certify external production systems.',
+    blindspots: ['Independent verification is still limited to the local workspace.'],
+    knownLimitations: ['Does not replace consumer-specific adapters or deployment pipelines.'],
+    adversarialClaims: ['A scorecard can be mistaken for a verified artifact.'],
+    battleScars: ['Readiness language used to outpace machine-readable evidence.'],
+    relatedProofSurfaces: ['@aaes-os/sovereignx-router'],
+    currentMaturity: 'Verified Prototype',
+    commercialReadiness: {
+      targetTier: 'Builder',
+      intendedCustomer: 'Governance teams and tool builders',
+      primaryUseCase: 'Machine-readable proof-surface publication',
+      valueProposition: 'A standard claim/evidence contract for dashboards and product tiers.',
+      currentReadiness: 'Prototype',
+    },
+    nextRequiredEvidence: ['Independent consumer integration'],
+    ...overrides,
+  };
+}
 
 describe('OpsConsoleView', () => {
-  it('renders the MRI, enforcement, and meta constitutional cockpits with seeded data', () => {
+  it('renders the knowledge graph and constitutional profile for proof surfaces', () => {
     const html = renderToString(
-      <OpsConsoleView
+      <OpsConsoleShell
         telemetry={{
           drift: { score: 0.2, totalFaults: 2, uniquePatterns: 1, topPatterns: [] },
           topPatterns: [],
@@ -54,14 +108,49 @@ describe('OpsConsoleView', () => {
         }}
         enforcement={{ events: [{ receiptId: 'cen:1', verdict: 'DENY', reasonCode: 'INVARIANT_VIOLATION' }], status: 'ACTIVE' }}
         meta={{ podId: 'meta_constitutional_collapse', generativeCoreId: 'CML-15', metaInvariantCount: 4 }}
+        arenaMode={createArenaModeSnapshot('ops-console-test-seed')}
+        proofSurfaceCatalog={{
+          status: 'loaded',
+          catalogUrl: 'http://127.0.0.1:4000/proof-surfaces',
+          proofSurfaces: [
+            buildProofSurfaceSummary(),
+            buildProofSurfaceSummary({
+              identity: {
+                id: '@aaes-os/sovereignx-router',
+                name: 'SovereignX Execution Surface',
+                type: 'runtime',
+              },
+              domain: 'Execution',
+              healthIndicator: 'Experimental',
+              proofLevel: 'P2',
+              maturity: 'Verified Prototype',
+              verificationStatus: 'Test Verified',
+              whatItProves: 'Governed execution receipts and replayable operator evidence.',
+              whatItDoesNotProve: 'It does not prove production cluster orchestration.',
+              relatedProofSurfaces: ['@aaes-os/aaes-governance'],
+            }),
+          ],
+        }}
+        catalogUrlInput="http://127.0.0.1:4000/proof-surfaces"
+        selectedProofSurfaceId="@aaes-os/sovereignx-router"
+        onCatalogUrlInputChange={() => undefined}
+        onCatalogSubmit={(event) => event.preventDefault()}
+        onResetCatalogUrl={() => undefined}
+        onUseQueryCatalogUrl={() => undefined}
+        onSelectedProofSurfaceChange={() => undefined}
       />
     );
 
-    expect(html).toContain('MRI Cockpit');
-    expect(html).toContain('Enforcement Dashboard');
-    expect(html).toContain('Meta-Constitutional Console');
-    expect(html).toContain('AAIS Runtime');
-    expect(html).toContain('connected');
-    expect(html).toContain('CML-15');
+    expect(html).toContain('Constitutional Knowledge Graph');
+    expect(html).toContain('Governance');
+    expect(html).toContain('Execution');
+    expect(html).toContain('Arena Mode');
+    expect(html).toContain('Challenge');
+    expect(html).toContain('Tournament');
+    expect(html).toContain('Replay Timeline');
+    expect(html).toContain('What it proves');
+    expect(html).toContain('What it does not prove');
+    expect(html).toContain('Related proof surfaces');
+    expect(html).toContain('SovereignX Execution Surface');
   });
 });

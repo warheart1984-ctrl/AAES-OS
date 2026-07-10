@@ -1,8 +1,16 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import { fileURLToPath } from 'node:url';
+
+const operatorConfigEntry = fileURLToPath(new URL('../../packages/operator-config/src/index.ts', import.meta.url));
 
 export default defineConfig({
   plugins: [react()],
+  resolve: {
+    alias: {
+      '@aaes-os/operator-config': operatorConfigEntry,
+    },
+  },
   server: {
     port: 5173,
     proxy: {
@@ -17,6 +25,7 @@ export default defineConfig({
       '/nimf': 'http://localhost:4000',
       '/evolution': 'http://localhost:4000',
       '/meta': 'http://localhost:4000',
+      '/arena': 'http://localhost:4000',
     },
   },
   build: {
