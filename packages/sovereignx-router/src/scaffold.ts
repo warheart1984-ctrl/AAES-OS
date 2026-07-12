@@ -71,6 +71,36 @@ export interface SovereignXResourceGovernance {
   allowUntrustedShaders?: boolean;
 }
 
+export interface SovereignXExecutionEvidence {
+  receipts: string[];
+  artifacts: string[];
+  summary: string;
+}
+
+export interface SovereignXExecutionVerification {
+  method: string;
+  validator: string;
+  replayArtifacts: string[];
+  replayable: boolean;
+}
+
+export interface SovereignXExecutionCompliance {
+  requirements: string[];
+  satisfied: boolean;
+  issues: string[];
+}
+
+export interface SovereignXExecutionContract {
+  operation: string;
+  subjectId: string;
+  intentId: string;
+  authority: string;
+  evidence: SovereignXExecutionEvidence;
+  verification: SovereignXExecutionVerification;
+  compliance: SovereignXExecutionCompliance;
+  truthBoundary: string;
+}
+
 export interface SovereignXDevice {
   id: string;
   name: string;
@@ -264,7 +294,16 @@ export interface SovereignXClaim {
 export interface SovereignXProofSurface {
   id: string;
   label: string;
-  kind: 'resource' | 'shader' | 'pipeline' | 'swapchain' | 'command' | 'render-pass' | 'framebuffer' | 'lifecycle';
+  kind:
+    | 'resource'
+    | 'shader'
+    | 'pipeline'
+    | 'swapchain'
+    | 'command'
+    | 'render-pass'
+    | 'framebuffer'
+    | 'lifecycle'
+    | 'execution';
   claimId: string;
   evidenceIds: string[];
   proofLevel: ProofLevel;
@@ -273,6 +312,11 @@ export interface SovereignXProofSurface {
   operationalStatus: ProofSurfaceOperationalStatus;
   truthBoundary: string;
   sourceId: string;
+  executionContract?: SovereignXExecutionContract;
+}
+
+export interface SovereignXExecutionProofSurface extends SovereignXProofSurface {
+  executionContract: SovereignXExecutionContract;
 }
 
 export interface SovereignXEvidenceGraphResolver {
@@ -301,6 +345,8 @@ export interface SovereignXReceipt {
   governance: SovereignXResourceGovernance;
   claimId?: string;
   proofSurfaceId?: string;
+  executionProofSurfaceId: string;
+  executionContract: SovereignXExecutionContract;
   metadata: Record<string, unknown>;
 }
 
@@ -1002,7 +1048,7 @@ export class SovereignXScaffold {
       proofLevel: 'P2',
       verificationStatus: 'Implemented',
       replayStatus: 'Replayable',
-      operationalStatus: 'Prototype',
+      operationalStatus: 'Verified Prototype',
       truthBoundary: 'SovereignX scaffold truth boundary',
       sourceId,
     };
@@ -1017,6 +1063,103 @@ export class SovereignXScaffold {
     };
     this.claims.push(claim);
     return proofSurface;
+  }
+
+  private registerExecutionProofSurface(input: {
+    receiptId: string;
+    operation: string;
+    subjectId: string;
+    intentId: string;
+    outcome: SovereignXReceiptOutcome;
+    routeEvaluation: RouteEvaluation;
+    validationIssues: string[];
+    governance: SovereignXResourceGovernance;
+  }): SovereignXExecutionProofSurface {
+    const executionContract = this.buildExecutionContract(input);
+    const proofSurfaceId = `${input.receiptId}-execution-proof`;
+    const claimId = `${input.receiptId}-execution-claim`;
+    const evidenceIds = [input.receiptId, input.routeEvaluation.evidence.id];
+    const proofSurface: SovereignXExecutionProofSurface = {
+      id: proofSurfaceId,
+      label: `Execution ${input.operation}`,
+      kind: 'execution',
+      claimId,
+      evidenceIds,
+      proofLevel: 'P2',
+      verificationStatus: 'Implemented',
+      replayStatus: 'Replayable',
+      operationalStatus: 'Verified Prototype',
+      truthBoundary: executionContract.truthBoundary,
+      sourceId: input.receiptId,
+      executionContract,
+    };
+    this.proofSurfaces.push(proofSurface);
+    const claim: SovereignXClaim = {
+      id: claimId,
+      role: input.intentId,
+      statement: `${input.operation} executed for ${input.subjectId} under ${input.intentId}`,
+      proofSurfaceId: proofSurface.id,
+      evidenceIds,
+      status: input.outcome === 'allow' ? 'verified' : 'pending',
+    };
+    this.claims.push(claim);
+    return proofSurface;
+  }
+
+  private buildExecutionContract(input: {
+    receiptId: string;
+    operation: string;
+    subjectId: string;
+    intentId: string;
+    outcome: SovereignXReceiptOutcome;
+    routeEvaluation: RouteEvaluation;
+    validationIssues: string[];
+    governance: SovereignXResourceGovernance;
+  }): SovereignXExecutionContract {
+    const authority = input.governance.claimId
+      ? `claim ${input.governance.claimId} authorized by intent ${input.intentId}`
+      : `intent ${input.intentId} authorized by AAES governance`;
+    const evidenceIds = [input.receiptId, input.routeEvaluation.evidence.id];
+    const artifacts = [
+      `receipt:${input.receiptId}`,
+      `evidence:${input.routeEvaluation.evidence.id}`,
+      `route:${input.routeEvaluation.localDecision.target}`,
+    ];
+    const complianceRequirements = [
+      'Intent must be registered before execution',
+      'Authority must resolve through governed intent',
+      'Evidence must exist for the execution path',
+      'Verification must remain replayable',
+      'Truth boundary must be declared',
+    ];
+    const complianceIssues = input.validationIssues.length > 0 ? [...input.validationIssues] : [];
+    const allowed = input.outcome === 'allow' && complianceIssues.length === 0;
+
+    return {
+      operation: input.operation,
+      subjectId: input.subjectId,
+      intentId: input.intentId,
+      authority,
+      evidence: {
+        receipts: [input.receiptId],
+        artifacts,
+        summary: `Execution receipt ${input.receiptId} and routed evidence ${input.routeEvaluation.evidence.id} prove ${input.operation}.`,
+      },
+      verification: {
+        method: 'Replay the routed work item, validate the execution proof surface, and inspect the emitted receipt.',
+        validator: 'SovereignX scaffold execution contract',
+        replayArtifacts: evidenceIds,
+        replayable: true,
+      },
+      compliance: {
+        requirements: complianceRequirements,
+        satisfied: allowed,
+        issues: complianceIssues,
+      },
+      truthBoundary: allowed
+        ? `SovereignX proves governed execution for ${input.subjectId}, not full cluster orchestration.`
+        : `SovereignX proves the execution request was evaluated and denied or constrained, not unrestricted GPU/runtime access.`,
+    };
   }
 
   private recordReceipt(receipt: SovereignXReceipt): SovereignXReceipt {
@@ -1080,8 +1223,28 @@ export class SovereignXScaffold {
       localDecision: routeDecision,
       timestamp: new Date(now).toISOString(),
     };
+    const receiptId = this.nextId('receipt');
+    const executionProofSurface = this.registerExecutionProofSurface({
+      receiptId,
+      operation,
+      subjectId,
+      intentId,
+      outcome: 'allow',
+      routeEvaluation: {
+        workItem: clone(workItem),
+        runtime,
+        limits,
+        measurementHealth,
+        localDecision: routeDecision,
+        ciemsDecisions: [],
+        effectiveDecision: routeDecision,
+        evidence,
+      },
+      validationIssues: [],
+      governance: { intentId },
+    });
     const receipt: SovereignXReceipt = {
-      id: this.nextId('receipt'),
+      id: receiptId,
       kind: 'lifecycle',
       operation,
       subjectId,
@@ -1102,6 +1265,8 @@ export class SovereignXScaffold {
       },
       validationIssues: [],
       governance: { intentId },
+      executionProofSurfaceId: executionProofSurface.id,
+      executionContract: executionProofSurface.executionContract,
       metadata: { ...metadata },
     };
     return this.recordReceipt(receipt);
@@ -1164,8 +1329,19 @@ export class SovereignXScaffold {
     runtime.vramTotalBytes = this.limits.maxVramBytes;
     const routeEvaluation = this.router.evaluate(workItem, runtime, this.mapGovernanceLimits());
     const outcome = this.mapOutcome(routeEvaluation, validationIssues);
+    const receiptId = this.nextId('receipt');
+    const executionProofSurface = this.registerExecutionProofSurface({
+      receiptId,
+      operation: options.operation,
+      subjectId: options.subjectId,
+      intentId: options.intentId,
+      outcome,
+      routeEvaluation,
+      validationIssues,
+      governance: options.governance,
+    });
     const receipt: SovereignXReceipt = {
-      id: this.nextId('receipt'),
+      id: receiptId,
       kind: options.kind,
       operation: options.operation,
       subjectId: options.subjectId,
@@ -1179,6 +1355,8 @@ export class SovereignXScaffold {
       governance: clone(options.governance),
       claimId: options.governance.claimId,
       proofSurfaceId: options.governance.proofSurfaceId,
+      executionProofSurfaceId: executionProofSurface.id,
+      executionContract: executionProofSurface.executionContract,
       metadata: { ...options.metadata },
     };
     this.recordReceipt(receipt);
@@ -1245,8 +1423,19 @@ export class SovereignXScaffold {
       defaultRuntimeStats(),
       this.mapGovernanceLimits(),
     );
+    const receiptId = this.nextId('receipt');
+    const executionProofSurface = this.registerExecutionProofSurface({
+      receiptId,
+      operation,
+      subjectId,
+      intentId: `sx.${operation}`,
+      outcome: 'deny',
+      routeEvaluation,
+      validationIssues: [...issues],
+      governance: { intentId: `sx.${operation}` },
+    });
     return {
-      id: this.nextId('receipt'),
+      id: receiptId,
       kind: 'governance',
       operation,
       subjectId,
@@ -1258,6 +1447,8 @@ export class SovereignXScaffold {
       routeEvaluation,
       validationIssues: [...issues],
       governance: { intentId: `sx.${operation}` },
+      executionProofSurfaceId: executionProofSurface.id,
+      executionContract: executionProofSurface.executionContract,
       metadata: { issues: [...issues] },
     };
   }

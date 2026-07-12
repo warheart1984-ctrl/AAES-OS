@@ -5,6 +5,7 @@ import {
   SovereignXScaffold,
   SovereignXViolationError,
   createSovereignXScaffold,
+  type SovereignXExecutionContract,
   type SovereignXClaim,
   type SovereignXProofSurface,
   type SovereignXReceipt,
@@ -25,6 +26,38 @@ function createGovernance(intentId: string, extras: Partial<NonNullable<Sovereig
   return {
     intentId,
     ...extras,
+  };
+}
+
+function createExecutionContract(operation: string, subjectId: string, intentId: string): SovereignXExecutionContract {
+  return {
+    operation,
+    subjectId,
+    intentId,
+    authority: `intent ${intentId} authorized by AAES governance`,
+    evidence: {
+      receipts: [`receipt-${operation}`],
+      artifacts: [`receipt:receipt-${operation}`, `evidence:evidence-${operation}`, 'route:CPU'],
+      summary: `${operation} execution is evidenced by the emitted receipt and routed evidence.`,
+    },
+    verification: {
+      method: 'Replay the routed work item, validate the execution proof surface, and inspect the emitted receipt.',
+      validator: 'SovereignX scaffold execution contract',
+      replayArtifacts: [`receipt-${operation}`, `evidence-${operation}`],
+      replayable: true,
+    },
+    compliance: {
+      requirements: [
+        'Intent must be registered before execution',
+        'Authority must resolve through governed intent',
+        'Evidence must exist for the execution path',
+        'Verification must remain replayable',
+        'Truth boundary must be declared',
+      ],
+      satisfied: true,
+      issues: [],
+    },
+    truthBoundary: `SovereignX proves governed execution for ${subjectId}, not full cluster orchestration.`,
   };
 }
 
@@ -145,11 +178,16 @@ describe('SovereignX scaffold', () => {
     expect(framebuffer.renderPassId).toBe(renderPass.id);
     expect(submitReceipt.outcome).toBe('allow');
     expect(presentReceipt.outcome).toBe('allow');
+    expect(submitReceipt.executionProofSurfaceId).toContain('execution-proof');
+    expect(submitReceipt.executionContract.authority).toContain('sx.submit_commands');
     expect(assetScaffold.listReceipts().length).toBeGreaterThan(0);
     expect(frameScaffold.listReceipts().length).toBeGreaterThan(0);
     expect(frameScaffold.listProofSurfaces().length).toBeGreaterThan(0);
+    expect(frameScaffold.listProofSurfaces().some((surface) => surface.kind === 'execution')).toBe(true);
     expect(assetScaffold.resolveClaim(`${buffer.id}-claim`)).not.toBeNull();
-    expect(frameScaffold.resolveProofSurface(`${swapchain.id}-proof`)).not.toBeNull();
+    expect(frameScaffold.resolveProofSurface(submitReceipt.executionProofSurfaceId)).toMatchObject({
+      kind: 'execution',
+    });
   });
 
   it('waits idle through a standalone lifecycle receipt', () => {
@@ -228,6 +266,7 @@ describe('SovereignX scaffold', () => {
       operationalStatus: 'Prototype',
       truthBoundary: 'external truth boundary',
       sourceId: 'external-source',
+      executionContract: createExecutionContract('resolve', 'external-source', 'sx.resolve'),
     };
     const externalReceipt: SovereignXReceipt = {
       id: 'external-receipt',
@@ -311,6 +350,8 @@ describe('SovereignX scaffold', () => {
       },
       validationIssues: [],
       governance: { intentId: 'sx.resolve' },
+      executionProofSurfaceId: 'external-execution-surface',
+      executionContract: createExecutionContract('resolve', 'external-source', 'sx.resolve'),
       metadata: {},
     };
 

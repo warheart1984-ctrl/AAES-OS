@@ -1,6 +1,12 @@
 import {
   CiemsBrain,
 } from './ciems.js';
+import {
+  buildRouteDecisionArtifact,
+  evaluateRouteGovernance,
+  type CanonicalRouteDecisionArtifact,
+  type RouteDecisionReplayContext,
+} from './routeDecision.js';
 import type {
   AgentBudgetSnapshot,
   CiemsDecision,
@@ -10,10 +16,15 @@ import type {
   MeasurementHealth,
   RouteDecision,
   RouteEvaluation,
+  RelationshipTrustView,
+  SovereignXModelDecision,
+  SovereignXPreferredModel,
+  SovereignXRoutingHint,
   RuntimeMode,
   RuntimeStats,
   WorkItem,
 } from './types.js';
+import { trustPolicyForGovernanceLevel, type GovernanceTrustPolicy, type GovernanceTrustLevel } from './trust.js';
 
 function clone<T>(value: T): T {
   return structuredClone(value);
@@ -43,6 +54,29 @@ export interface SovereignXRouterOptions {
   windowMs?: number;
 }
 
+export interface SovereignXCanonicalRouteInput {
+  requestId: string;
+  orgId: string;
+  customerId?: string;
+  workItem: WorkItem;
+  runtime: RuntimeStats;
+  limits: GovernanceLimits;
+  trustPacket: import('./types.js').RelationshipLedgerTrustPacket;
+  trustPolicy?: GovernanceTrustPolicy;
+  provenance: {
+    originSystem: string;
+    originActorId?: string;
+    method: string;
+    standardsTraceabilityIds?: string[];
+  };
+  replay?: RouteDecisionReplayContext;
+  decidedBy?: string;
+  decidedAt?: string;
+  configVersion?: string;
+  signingSecret?: string;
+  signer?: string;
+}
+
 export class SovereignXRouter {
   private readonly clock: () => number;
   private readonly windowMs: number;
@@ -52,6 +86,7 @@ export class SovereignXRouter {
   private readonly decisions: RouteEvaluation[] = [];
   private measurementHealth = createEmptyMeasurementHealth();
   private runtimeMode: RuntimeMode = 'Normal';
+  private overrideModel: SovereignXPreferredModel | null = null;
 
   constructor(options: SovereignXRouterOptions = {}) {
     this.clock = options.clock ?? (() => Date.now());
@@ -91,6 +126,85 @@ export class SovereignXRouter {
     return this.runtimeMode;
   }
 
+  setOverride(model: SovereignXPreferredModel | null): void {
+    this.overrideModel = model;
+  }
+
+  getOverride(): SovereignXPreferredModel | null {
+    return this.overrideModel;
+  }
+
+  resolveModelDecision(input: {
+    promptTokens: number;
+    routingHint?: SovereignXRoutingHint;
+    trust?: RelationshipTrustView;
+    governanceLevel?: GovernanceTrustLevel;
+    trustPolicy?: GovernanceTrustPolicy;
+  }): SovereignXModelDecision {
+    const trustPolicy = input.trustPolicy ?? trustPolicyForGovernanceLevel(input.governanceLevel);
+
+    if (this.overrideModel) {
+      return {
+        model: this.overrideModel,
+        reason: 'user override',
+        overrideApplied: true,
+        ...(input.trust ? { trust: clone(input.trust) } : {}),
+      };
+    }
+
+    if (input.trust && !this.isTrustAllowed(input.trust, trustPolicy)) {
+      return {
+        model: 'qwen-3b',
+        reason: `trust does not satisfy ${trustPolicy.governanceLevel} governance thresholds`,
+        overrideApplied: false,
+        trust: clone(input.trust),
+      };
+    }
+
+    if (input.trust && input.trust.band === 'low') {
+      return {
+        model: 'qwen-3b',
+        reason: 'low trust keeps the request on the smaller reasoning surface',
+        overrideApplied: false,
+        trust: clone(input.trust),
+      };
+    }
+
+    if (input.trust && input.trust.score >= 0.7 && input.promptTokens > 12) {
+      return {
+        model: 'qwen-7b',
+        reason: 'high trust and moderate complexity justify the larger reasoning surface',
+        overrideApplied: false,
+        trust: clone(input.trust),
+      };
+    }
+
+    if (input.routingHint?.preferredModel) {
+      return {
+        model: input.routingHint.preferredModel,
+        reason: input.routingHint.reason ?? 'AAIS routing hint',
+        overrideApplied: false,
+        ...(input.trust ? { trust: clone(input.trust) } : {}),
+      };
+    }
+
+    if (input.promptTokens > 18) {
+      return {
+        model: 'qwen-7b',
+        reason: 'prompt size heuristic',
+        overrideApplied: false,
+        ...(input.trust ? { trust: clone(input.trust) } : {}),
+      };
+    }
+
+    return {
+      model: 'qwen-3b',
+      reason: 'prompt size heuristic',
+      overrideApplied: false,
+      ...(input.trust ? { trust: clone(input.trust) } : {}),
+    };
+  }
+
   getDecisions(): RouteEvaluation[] {
     return this.decisions.map((entry) => clone(entry));
   }
@@ -101,6 +215,34 @@ export class SovereignXRouter {
 
   route(workItem: WorkItem, runtime: RuntimeStats, limits: GovernanceLimits): RouteDecision {
     return this.evaluate(workItem, runtime, limits).effectiveDecision;
+  }
+
+  evaluateRoute(input: SovereignXCanonicalRouteInput): CanonicalRouteDecisionArtifact {
+    const routeEvaluation = this.evaluate(input.workItem, input.runtime, input.limits);
+    const trustPolicy = input.trustPolicy ?? trustPolicyForGovernanceLevel(input.trustPacket.governanceLevel);
+    const governanceDecision = evaluateRouteGovernance(input.trustPacket, trustPolicy, {
+      decidedBy: input.decidedBy,
+      decidedAt: input.decidedAt,
+      configVersion: input.configVersion,
+    });
+
+    return buildRouteDecisionArtifact({
+      artifactId: input.requestId,
+      requestId: input.requestId,
+      orgId: input.orgId,
+      customerId: input.customerId,
+      relationshipId: input.trustPacket.relationshipId,
+      trustPacket: input.trustPacket,
+      trustPolicy,
+      routeEvaluation,
+      provenance: input.provenance,
+      decidedBy: governanceDecision.decidedBy,
+      decidedAt: governanceDecision.decidedAt,
+      configVersion: governanceDecision.configVersion,
+      replay: input.replay,
+      signingSecret: input.signingSecret,
+      signer: input.signer,
+    });
   }
 
   evaluate(workItem: WorkItem, runtime: RuntimeStats, limits: GovernanceLimits): RouteEvaluation {
@@ -260,5 +402,32 @@ export class SovereignXRouter {
 
   private isGpuFriendlyKind(kind: WorkItem['kind']): boolean {
     return kind === 'llm_step' || kind === 'render_frame' || kind === 'matmul' || kind === 'attention' || kind === 'mlp' || kind === 'physics_step';
+  }
+
+  private isTrustAllowed(trust: RelationshipTrustView, policy: GovernanceTrustPolicy): boolean {
+    const bandRank = (band: RelationshipTrustView['band']): number => {
+      switch (band) {
+        case 'low':
+          return 0;
+        case 'medium':
+          return 1;
+        case 'high':
+          return 2;
+      }
+    };
+
+    if (trust.score < policy.minTrustScore) {
+      return false;
+    }
+
+    if (policy.minTrustBand && bandRank(trust.band) < bandRank(policy.minTrustBand)) {
+      return false;
+    }
+
+    if (policy.preferHighTrustBand && trust.band !== 'high') {
+      return false;
+    }
+
+    return true;
   }
 }

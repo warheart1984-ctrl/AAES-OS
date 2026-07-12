@@ -18,6 +18,7 @@
     "@aaes-os/sgce": "workspace:*",
     "@aaes-os/sovren": "workspace:*",
     "@aaes-os/aaes-governance": "workspace:*",
+    "@aaes-os/sovereignx-router": "workspace:*",
     "express": "^5.1.0"
   },
   "devDependencies": {

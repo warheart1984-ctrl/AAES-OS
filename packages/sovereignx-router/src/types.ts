@@ -1,5 +1,65 @@
 export type RouteTarget = 'CPU' | 'GPU' | 'DROP' | 'DELAY';
 
+export type SovereignXPreferredModel = 'qwen-3b' | 'qwen-7b';
+
+export type TrustBand = 'low' | 'medium' | 'high';
+
+export interface ConstitutionalSignature {
+  algorithm: 'HMAC-SHA256' | 'Ed25519';
+  value: string;
+  signer?: string;
+  signedAt?: string;
+}
+
+export interface TrustProvenance {
+  originSystem: string;
+  originActorId?: string;
+  method: string;
+  createdAt?: string;
+  standardsTraceabilityIds?: string[];
+}
+
+export interface TrustAuthority {
+  stewardId?: string;
+  consentArtifactIds?: string[];
+  delegationChainIds?: string[];
+}
+
+export interface RelationshipTrustView {
+  score: number;
+  band: TrustBand;
+  evidenceIds: string[];
+  authority?: TrustAuthority;
+  provenance?: TrustProvenance;
+}
+
+export interface RelationshipLedgerTrustPacket {
+  relationshipId: string;
+  revision: number;
+  subjectId?: string;
+  objectId?: string;
+  relationshipKind?: string;
+  ledgerEntryId?: string;
+  receiptId?: string;
+  capturedAt?: string;
+  governanceLevel: 'basic' | 'enhanced' | 'full';
+  authorityChain: string[];
+  trust: RelationshipTrustView;
+  signature?: ConstitutionalSignature;
+}
+
+export interface SovereignXRoutingHint {
+  preferredModel?: SovereignXPreferredModel;
+  reason?: string;
+}
+
+export interface SovereignXModelDecision {
+  model: SovereignXPreferredModel;
+  reason: string;
+  overrideApplied: boolean;
+  trust?: RelationshipTrustView;
+}
+
 export type RuntimeMode =
   | 'Normal'
   | 'GpuDegraded'
@@ -106,4 +166,6 @@ export interface RouteEvaluation {
   ciemsDecisions: CiemsDecision[];
   effectiveDecision: RouteDecision;
   evidence: EvidenceRecord;
+  modelDecision?: SovereignXModelDecision;
+  trust?: RelationshipTrustView;
 }

@@ -3,12 +3,14 @@ import react from '@vitejs/plugin-react';
 import { fileURLToPath } from 'node:url';
 
 const operatorConfigEntry = fileURLToPath(new URL('../../packages/operator-config/src/index.ts', import.meta.url));
+const coriAlphaSummaryEntry = fileURLToPath(new URL('../../packages/platform-core/src/coriAlphaSummary.tsx', import.meta.url));
 
 export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
       '@aaes-os/operator-config': operatorConfigEntry,
+      '@aaes-os/platform-core/coriAlphaSummary': coriAlphaSummaryEntry,
     },
   },
   server: {

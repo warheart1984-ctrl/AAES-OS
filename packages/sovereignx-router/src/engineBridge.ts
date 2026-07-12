@@ -2,10 +2,12 @@ import type {
   GovernanceLimits,
   RouteEvaluation,
   RuntimeStats,
+  RelationshipTrustView,
   SovereignXModelDecision,
   SovereignXRoutingHint,
   WorkItem,
 } from './types.js';
+import type { GovernanceTrustPolicy, GovernanceTrustLevel } from './trust.js';
 import type { SovereignXRouter } from './SovereignXRouter.js';
 
 export type SovereignXEngineBackend = 'cpu' | 'opencl' | 'vulkan';
@@ -24,6 +26,9 @@ export interface SovereignXLlmInferenceRequest {
   tenantId?: string;
   preferredGpuBackend?: Exclude<SovereignXEngineBackend, 'cpu'>;
   routingHint?: SovereignXRoutingHint;
+  trust?: RelationshipTrustView;
+  governanceLevel?: GovernanceTrustLevel;
+  trustPolicy?: GovernanceTrustPolicy;
 }
 
 export interface SovereignXLlmRoutingResult {
@@ -65,14 +70,27 @@ export function routeSovereignXLlmInference(
   };
 
   const routeEvaluation = router.evaluate(workItem, runtime, limits);
+  const trust = request.trust
+    ? {
+        score: request.trust.score,
+        band: request.trust.band,
+        evidenceIds: [...request.trust.evidenceIds],
+        authority: request.trust.authority ? { ...request.trust.authority } : undefined,
+        provenance: request.trust.provenance ? { ...request.trust.provenance } : undefined,
+      }
+    : undefined;
   const modelDecision = router.resolveModelDecision({
     promptTokens: request.promptTokens,
     routingHint: request.routingHint,
+    trust,
+    governanceLevel: request.governanceLevel,
+    trustPolicy: request.trustPolicy,
   });
+  const routedRouteEvaluation = trust ? { ...routeEvaluation, trust, modelDecision: { ...modelDecision, trust } } : routeEvaluation;
   return {
-    routeEvaluation,
+    routeEvaluation: routedRouteEvaluation,
     backend: mapBackend(routeEvaluation, request.preferredGpuBackend),
-    modelDecision,
+    modelDecision: trust ? { ...modelDecision, trust } : modelDecision,
   };
 }
 
