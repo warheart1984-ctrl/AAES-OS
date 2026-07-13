@@ -43,6 +43,7 @@ export interface TrustEvaluationPolicy {
   governanceLevel: 'basic' | 'enhanced' | 'full';
   minTrustScore: number;
   requiredBand: TrustBand;
+  preferHighTrustBand: boolean;
   minEvidenceCount: number;
   minAuthorityChainLength: number;
   confidenceWeight: number;

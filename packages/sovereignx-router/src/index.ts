@@ -5,7 +5,6 @@ export * from './routingDsl.js';
 export * from './continuity.js';
 export * from './trust.js';
 export * from './trustSpecification.js';
-export { signRelationshipTrustPacket, verifyRelationshipTrustPacket } from './trust.js';
 export {
   mapBackend,
   invokeSovereignXLlmInference,
@@ -15,7 +14,6 @@ export {
 } from './engineBridge.js';
 export * from './proofSurface.js';
 export * from './routeDecision.js';
-export { buildRouteDecisionArtifact, verifyRouteDecisionArtifact } from './routeDecision.js';
 export * from './SovereignXRouter.js';
 export * from './pricing.js';
 export * from './scaffold.js';

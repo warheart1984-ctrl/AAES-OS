@@ -168,6 +168,7 @@ export interface PolityLifecycleEvent {
   artifactId: string;
   createdAt: string;
   summary: string;
+  outcome?: string;
 }
 
 export interface ContinuityReceipt {
@@ -510,6 +511,7 @@ export function buildPolityLifecycleEvent(input: {
   artifactId: string;
   createdAt: string;
   summary: string;
+  outcome?: string;
 }): PolityLifecycleEvent {
   return {
     eventId: input.eventId,
@@ -517,6 +519,7 @@ export function buildPolityLifecycleEvent(input: {
     artifactId: input.artifactId,
     createdAt: input.createdAt,
     summary: input.summary,
+    outcome: input.outcome,
   };
 }
 
