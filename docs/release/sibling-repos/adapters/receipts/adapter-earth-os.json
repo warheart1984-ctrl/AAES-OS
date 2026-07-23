@@ -1,0 +1,49 @@
+{
+  "artifact": "sibling-adapter-contract-receipt",
+  "version": "0.1.0",
+  "adapterId": "adapter-earth-os",
+  "siblingId": "earth-os",
+  "family": "earth-os",
+  "mode": "product-checkout",
+  "failClosed": true,
+  "verdict": "pass",
+  "checkedAt": "2026-07-23T02:43:47.470Z",
+  "evidenceHash": "b9fdc8c78e46c3597dc5cf96124d0d64883d2ae773ed1d7760a5eaed9b53e4d6",
+  "siblingEvidenceHash": "12760b8160c3ad2904885a6aff245403e1693a510285a99e8d9997806a711708",
+  "path": "G:/Earth-OS",
+  "remoteUrl": "https://github.com/warheart1984-ctrl/Earth-OS.git",
+  "headCommit": "d803de76ab1b5b3fd0e5d5a771a929c1ae1defbe",
+  "checks": [
+    {
+      "id": "sibling-discovery-verified",
+      "passed": true,
+      "detail": "sibling status=verified"
+    },
+    {
+      "id": "remote-match",
+      "passed": true,
+      "detail": "expected=https://github.com/warheart1984-ctrl/Earth-OS.git; observed=https://github.com/warheart1984-ctrl/Earth-OS.git"
+    },
+    {
+      "id": "required-artifacts",
+      "passed": true,
+      "detail": "present=README.md,docs/scorecards"
+    },
+    {
+      "id": "constitutional-receipt-present",
+      "passed": true,
+      "detail": "not required for this adapter mode"
+    }
+  ],
+  "blockers": [],
+  "knownLimitations": [
+    "Earth-OS adapter is documentation/scorecard presence only; no shared runtime wire."
+  ],
+  "observedReceipt": {
+    "path": null,
+    "maturity": null,
+    "receiptHash": null,
+    "verificationDate": null
+  },
+  "truthBoundary": "Adapter contracts prove fail-closed local contract checks against verified sibling checkouts. They do not prove live RPC/federation or shared runtime authority."
+}

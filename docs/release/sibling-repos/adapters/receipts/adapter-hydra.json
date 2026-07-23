@@ -1,0 +1,49 @@
+{
+  "artifact": "sibling-adapter-contract-receipt",
+  "version": "0.1.0",
+  "adapterId": "adapter-hydra",
+  "siblingId": "hydra",
+  "family": "hydra",
+  "mode": "adjacent-checkout",
+  "failClosed": true,
+  "verdict": "pass",
+  "checkedAt": "2026-07-23T02:43:47.470Z",
+  "evidenceHash": "1cd7892d0884d252ab40e1434124311fab179cd7fc0b6ceac9cd69d7db4674c0",
+  "siblingEvidenceHash": "12760b8160c3ad2904885a6aff245403e1693a510285a99e8d9997806a711708",
+  "path": "G:/HYDRA",
+  "remoteUrl": "https://github.com/standardgalactic/HYDRA.git",
+  "headCommit": "606ad8cd6be889760cb664a697c453554d360aa0",
+  "checks": [
+    {
+      "id": "sibling-discovery-verified",
+      "passed": true,
+      "detail": "sibling status=verified"
+    },
+    {
+      "id": "remote-match",
+      "passed": true,
+      "detail": "expected=https://github.com/standardgalactic/HYDRA.git; observed=https://github.com/standardgalactic/HYDRA.git"
+    },
+    {
+      "id": "required-artifacts",
+      "passed": true,
+      "detail": "present=README.md,LICENSE"
+    },
+    {
+      "id": "constitutional-receipt-present",
+      "passed": true,
+      "detail": "not required for this adapter mode"
+    }
+  ],
+  "blockers": [],
+  "knownLimitations": [
+    "HYDRA remote is outside warheart1984-ctrl; treated as adjacent, not core AAES authority."
+  ],
+  "observedReceipt": {
+    "path": null,
+    "maturity": null,
+    "receiptHash": null,
+    "verificationDate": null
+  },
+  "truthBoundary": "Adapter contracts prove fail-closed local contract checks against verified sibling checkouts. They do not prove live RPC/federation or shared runtime authority."
+}

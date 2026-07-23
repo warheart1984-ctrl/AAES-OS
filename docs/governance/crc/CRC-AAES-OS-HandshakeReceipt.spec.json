@@ -1,0 +1,66 @@
+{
+  "contractId": "CRC-AAES-OS-HandshakeReceipt",
+  "displayName": "AAES-OS Handshake Receipt Contract",
+  "version": "1.0.0",
+  "status": "Published",
+  "role": "Evidence artifact proving that a live federation handshake has occurred under declared conditions.",
+  "requiredFields": [
+    "receiptId",
+    "sessionId",
+    "remoteId",
+    "adapterId",
+    "transportId",
+    "receiptHash",
+    "constitutionalMaturity",
+    "capabilitiesGranted",
+    "issuedAt",
+    "expiresAt",
+    "issuer",
+    "revocationPath"
+  ],
+  "constraints": [
+    {
+      "id": "HR-C-1",
+      "name": "Adapter linkage",
+      "rule": "adapterId MUST reference a verified adapter in adapter-contract-registry.json / adapter-contract-evidence-index.json."
+    },
+    {
+      "id": "HR-C-2",
+      "name": "Transport linkage",
+      "rule": "transportId MUST reference a declared transport descriptor with tested=true and maturity Tested (trials) or Certified (production)."
+    },
+    {
+      "id": "HR-C-3",
+      "name": "Maturity consistency",
+      "rule": "constitutionalMaturity MUST be compatible with the remote's project-infi lineage when lineage is observed."
+    },
+    {
+      "id": "HR-C-4",
+      "name": "Hash integrity",
+      "rule": "receiptHash MUST match the serialized receipt payload (sha256 of canonical payload without receiptHash)."
+    },
+    {
+      "id": "HR-C-5",
+      "name": "Time validity",
+      "rule": "Current time MUST lie between issuedAt and expiresAt for the receipt to be considered valid."
+    },
+    {
+      "id": "HR-C-6",
+      "name": "Revocation requirement",
+      "rule": "revocationPath MUST NOT be empty; every receipt must have a revocation mechanism."
+    }
+  ],
+  "constitutionalMaturityEnum": [
+    "Prototype",
+    "VerifiedPrototype",
+    "Verified Prototype",
+    "Production Candidate",
+    "Certified"
+  ],
+  "storage": {
+    "registry": "docs/release/sibling-repos/federation/handshake-receipt-registry.json",
+    "evidenceIndex": "docs/release/sibling-repos/federation/handshake-receipt-evidence-index.json",
+    "receiptsDir": "docs/release/sibling-repos/federation/receipts"
+  },
+  "truthBoundary": "A handshake receipt proves a specific live session handshake under declared adapter and transport conditions. It does not permanently federate a remote beyond the receipt validity window."
+}

@@ -1,0 +1,47 @@
+{
+  "artifact": "sibling-adapter-contract-receipt",
+  "version": "0.1.0",
+  "adapterId": "adapter-ceip-temporal-standards",
+  "siblingId": "ceip-temporal-standards",
+  "family": "standards",
+  "mode": "standards-checkout",
+  "failClosed": true,
+  "verdict": "pass",
+  "checkedAt": "2026-07-23T02:43:47.470Z",
+  "evidenceHash": "c317b1b06fdc9b3dfaa0cf2409f4430d682143ffddc22ef5d026c1882cabd8b6",
+  "siblingEvidenceHash": "12760b8160c3ad2904885a6aff245403e1693a510285a99e8d9997806a711708",
+  "path": "G:/ceip-temporal-standards",
+  "remoteUrl": "https://github.com/warheart1984-ctrl/ceip-temporal-standards.git",
+  "headCommit": "984245a5385bdeb068dc604ce468b7fd7ab706de",
+  "checks": [
+    {
+      "id": "sibling-discovery-verified",
+      "passed": true,
+      "detail": "sibling status=verified"
+    },
+    {
+      "id": "remote-match",
+      "passed": true,
+      "detail": "expected=https://github.com/warheart1984-ctrl/ceip-temporal-standards.git; observed=https://github.com/warheart1984-ctrl/ceip-temporal-standards.git"
+    },
+    {
+      "id": "required-artifacts",
+      "passed": true,
+      "detail": "present=README.md,pyproject.toml"
+    },
+    {
+      "id": "constitutional-receipt-present",
+      "passed": true,
+      "detail": "not required for this adapter mode"
+    }
+  ],
+  "blockers": [],
+  "knownLimitations": [],
+  "observedReceipt": {
+    "path": null,
+    "maturity": null,
+    "receiptHash": null,
+    "verificationDate": null
+  },
+  "truthBoundary": "Adapter contracts prove fail-closed local contract checks against verified sibling checkouts. They do not prove live RPC/federation or shared runtime authority."
+}

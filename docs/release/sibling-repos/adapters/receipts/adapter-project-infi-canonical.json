@@ -1,0 +1,57 @@
+{
+  "artifact": "sibling-adapter-contract-receipt",
+  "version": "0.1.0",
+  "adapterId": "adapter-project-infi-canonical",
+  "siblingId": "project-infi",
+  "family": "project-infinity",
+  "mode": "canonical-lineage",
+  "failClosed": true,
+  "verdict": "pass",
+  "checkedAt": "2026-07-23T02:43:47.470Z",
+  "evidenceHash": "30c312007126d0a314b06544ddfb39bc23f88fe793c5cf83aae9c6d77c8a8209",
+  "siblingEvidenceHash": "12760b8160c3ad2904885a6aff245403e1693a510285a99e8d9997806a711708",
+  "path": "G:/project-infi",
+  "remoteUrl": "https://github.com/warheart1984-ctrl/project-infi.git",
+  "headCommit": "246a97a7a7426578c00cd4c2ce6124b6ed40cf33",
+  "checks": [
+    {
+      "id": "sibling-discovery-verified",
+      "passed": true,
+      "detail": "sibling status=verified"
+    },
+    {
+      "id": "remote-match",
+      "passed": true,
+      "detail": "expected=https://github.com/warheart1984-ctrl/project-infi.git; observed=https://github.com/warheart1984-ctrl/project-infi.git"
+    },
+    {
+      "id": "required-artifacts",
+      "passed": true,
+      "detail": "present=README.md,package.json,docs/scorecards/project-infi.md,release/constitutional-release-receipt.json"
+    },
+    {
+      "id": "constitutional-receipt-present",
+      "passed": true,
+      "detail": "found release/constitutional-release-receipt.json"
+    },
+    {
+      "id": "receipt-maturity-field",
+      "passed": true,
+      "detail": "constitutionalMaturity=Verified Prototype"
+    },
+    {
+      "id": "receipt-hash-field",
+      "passed": true,
+      "detail": "receiptHash=sha256:d755dc1fb5cdbd521659192c91e34e2374d49dc0811c385152370af3a1b18ddb"
+    }
+  ],
+  "blockers": [],
+  "knownLimitations": [],
+  "observedReceipt": {
+    "path": "release/constitutional-release-receipt.json",
+    "maturity": "Verified Prototype",
+    "receiptHash": "sha256:d755dc1fb5cdbd521659192c91e34e2374d49dc0811c385152370af3a1b18ddb",
+    "verificationDate": "2026-07-14T16:52:26.145Z"
+  },
+  "truthBoundary": "Adapter contracts prove fail-closed local contract checks against verified sibling checkouts. They do not prove live RPC/federation or shared runtime authority."
+}

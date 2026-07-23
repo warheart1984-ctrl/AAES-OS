@@ -1,0 +1,47 @@
+{
+  "artifact": "sibling-adapter-contract-receipt",
+  "version": "0.1.0",
+  "adapterId": "adapter-fae",
+  "siblingId": "fae",
+  "family": "fae",
+  "mode": "product-checkout",
+  "failClosed": true,
+  "verdict": "pass",
+  "checkedAt": "2026-07-23T02:43:47.470Z",
+  "evidenceHash": "277b7d68dcb37ff18a3eb127e845eb1d8c3fe22c8967efdae3b2fcc4dbd44c34",
+  "siblingEvidenceHash": "12760b8160c3ad2904885a6aff245403e1693a510285a99e8d9997806a711708",
+  "path": "G:/fae",
+  "remoteUrl": "https://github.com/warheart1984-ctrl/FAE.git",
+  "headCommit": "6ffcaf26637ed48c03bfa5c59bf1080106a1560c",
+  "checks": [
+    {
+      "id": "sibling-discovery-verified",
+      "passed": true,
+      "detail": "sibling status=verified"
+    },
+    {
+      "id": "remote-match",
+      "passed": true,
+      "detail": "expected=https://github.com/warheart1984-ctrl/FAE.git; observed=https://github.com/warheart1984-ctrl/FAE.git"
+    },
+    {
+      "id": "required-artifacts",
+      "passed": true,
+      "detail": "present=README.md,pyproject.toml"
+    },
+    {
+      "id": "constitutional-receipt-present",
+      "passed": true,
+      "detail": "not required for this adapter mode"
+    }
+  ],
+  "blockers": [],
+  "knownLimitations": [],
+  "observedReceipt": {
+    "path": null,
+    "maturity": null,
+    "receiptHash": null,
+    "verificationDate": null
+  },
+  "truthBoundary": "Adapter contracts prove fail-closed local contract checks against verified sibling checkouts. They do not prove live RPC/federation or shared runtime authority."
+}

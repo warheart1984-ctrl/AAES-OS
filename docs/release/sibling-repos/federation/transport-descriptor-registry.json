@@ -1,0 +1,46 @@
+{
+  "registryId": "aaes-os-federation-transport-descriptor-registry",
+  "version": "0.2.0",
+  "status": "Published",
+  "ccrId": "CCR-AAES-OS-RuntimeFederation",
+  "truthBoundary": "Transport maturity: Declared → Configured → Tested → Certified. Only Tested (internal trials) or Certified (production) may participate in live federation. Declared/Configured transports are fail-closed NotEligible.",
+  "maturityLadder": [
+    "Declared",
+    "Configured",
+    "Tested",
+    "Certified"
+  ],
+  "transports": [
+    {
+      "transportId": "opsConsole-SovereignX-v1",
+      "version": "1.0.0",
+      "protocol": "ops-console-sovereignx-control-plane",
+      "path": "ops-console → SovereignX",
+      "endpoints": {
+        "client": "services/ops-console",
+        "server": "packages/sovereignx-router"
+      },
+      "authMode": "workspace-local-control-plane",
+      "maturity": "Tested",
+      "tested": true,
+      "lastTestReceiptId": "tt-opsConsole-SovereignX-v1-70469d47",
+      "notes": "Moves Declared → Tested only via `npm run transports:test` with a transport test receipt. Certified requires separate operational evidence.",
+      "status": "tested"
+    },
+    {
+      "transportId": "platformWeb-PlatformApi-v1",
+      "version": "1.0.0",
+      "protocol": "http-json",
+      "path": "platform-web → platform-api",
+      "endpoints": {
+        "client": "services/platform-web",
+        "server": "services/platform-api"
+      },
+      "authMode": "http-json-local",
+      "maturity": "Declared",
+      "tested": false,
+      "lastTestReceiptId": null,
+      "notes": "Intra-monorepo HTTP path. Same transport test gate applies."
+    }
+  ]
+}

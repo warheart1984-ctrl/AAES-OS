@@ -1,0 +1,43 @@
+{
+  "ccrId": "CCR-AAES-OS-SiblingRepoDiscovery",
+  "displayName": "AAES-OS Sibling Repo Discovery Inheritance",
+  "version": "1.0.0",
+  "status": "Published",
+  "condition": "sibling-repo-evidence-index exists with status verified|partial",
+  "evidenceSource": "docs/release/sibling-repos/sibling-repo-evidence-index.json",
+  "inheritedFields": [
+    "siblingAggregateHash",
+    "siblingSummary",
+    "canonicalLineage"
+  ],
+  "authority": {
+    "source": "sibling-repo-evidence-index",
+    "primary": "aggregateHash"
+  },
+  "propagation": [
+    "sibling-evidence-index",
+    "production-hardening-index",
+    "scorecard",
+    "verification-lineage"
+  ],
+  "constitutionalGuarantee": "Cross-repo maturity language must inherit the latest sibling discovery evidence and must not claim live federation without adapter evidence.",
+  "connectionLadder": [
+    "discovery-registry",
+    "local-evidence-probe",
+    "canonical-inheritance",
+    "adapter-contracts",
+    "runtime-federation"
+  ],
+  "implementation": {
+    "registry": "docs/release/sibling-repos/sibling-repo-registry.json",
+    "probe": "tools/sibling-repo-evidence.ts",
+    "inheritance": "release/sibling-evidence-inheritance.ts",
+    "hardeningHook": "tools/production-hardening-evidence.ts"
+  },
+  "truthBoundary": "This CCR governs discovery and inheritance of sibling checkout evidence. Verified local presence or git remotes do not prove live API mesh, shared runtime authority, or federation handshakes.",
+  "traceabilityLinks": [
+    "docs/release/sibling-repos/CONNECTION_MAP.md",
+    "docs/scorecards/driveg-note.md",
+    "docs/release/production-hardening/README.md"
+  ]
+}

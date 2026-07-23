@@ -1,0 +1,79 @@
+{
+  "ccrId": "CCR-AAES-OS-RuntimeFederation",
+  "displayName": "AAES-OS Runtime Federation",
+  "version": "1.0.0",
+  "status": "Published",
+  "implementationStatus": "machinery-ready-live-grants-denied",
+  "scope": "Sibling mesh runtime sessions (Drive-G-1, SovereignX, ops-console, and related transports).",
+  "purpose": "Define the constitutional conditions under which live sibling federation is permitted, distinguishing checkout authority from live mesh authority.",
+  "inputs": [
+    "AdapterContracts (CCR-AAES-OS-SiblingAdapterContracts, verified fail-closed)",
+    "TransportDescriptor (declared and versioned)",
+    "HandshakeRequest",
+    "HandshakeReceipt (CRC-AAES-OS-HandshakeReceipt)"
+  ],
+  "invariants": [
+    {
+      "id": "RF-INV-1",
+      "name": "No live authority without receipt",
+      "rule": "A sibling remote MUST NOT be treated as federated unless a valid handshake receipt exists and is attached to the session lineage."
+    },
+    {
+      "id": "RF-INV-2",
+      "name": "Adapters are necessary but not sufficient",
+      "rule": "Verified adapter contracts prove checkout authority only. They do not grant live mesh authority without a handshake."
+    },
+    {
+      "id": "RF-INV-3",
+      "name": "Fail-closed by default",
+      "rule": "Absent a verified adapter, declared transport descriptor, or valid handshake receipt, the federation decision MUST resolve to deny."
+    },
+    {
+      "id": "RF-INV-4",
+      "name": "Lineage-backed sessions",
+      "rule": "Every live session must have a sessionId, a lineage record (adapter, transport, receipt), and a revocation path."
+    }
+  ],
+  "decisionStates": [
+    "NotEligible",
+    "HandshakePending",
+    "FederationDenied",
+    "FederationGranted"
+  ],
+  "handshakeReceiptContractId": "CRC-AAES-OS-HandshakeReceipt",
+  "authority": {
+    "source": "handshake-receipt-evidence-index",
+    "primary": "aggregateHash"
+  },
+  "propagation": [
+    "handshake-receipt-evidence",
+    "federation-lineage-log",
+    "production-hardening-index",
+    "scorecard",
+    "verification-lineage"
+  ],
+  "constitutionalGuarantee": "Live mesh authority is granted only when a verified adapter, declared transport, and valid handshake receipt are all present. Checkout adapter pass alone never grants FederationGranted.",
+  "connectionLadderStep": "runtime-federation",
+  "promotionConditions": [
+    "At least one transport is Tested or Certified (tested=true)",
+    "Indexed valid handshake receipts with receiptId, sessionId, remoteId, adapterId, transportId, issuedAt, expiresAt, receiptHash",
+    "Active session lineage entries with sessionId, remoteId, adapterId, transportId, receiptId and linked non-empty revocationPath",
+    "Grant events recorded as Active (not Pending-only); revocation events recordable via revokeSession"
+  ],
+  "implementation": {
+    "ccrDoc": "docs/governance/ccr-aaes-os-runtime-federation.md",
+    "handshakeContract": "docs/governance/crc/CRC-AAES-OS-HandshakeReceipt.spec.json",
+    "decisionEngine": "tools/runtime-federation.ts",
+    "transportRegistry": "docs/release/sibling-repos/federation/transport-descriptor-registry.json",
+    "receiptRegistry": "docs/release/sibling-repos/federation/handshake-receipt-registry.json",
+    "evidenceIndex": "docs/release/sibling-repos/federation/handshake-receipt-evidence-index.json",
+    "sessionLineageLog": "docs/release/sibling-repos/federation/session-lineage-log.json",
+    "ladderDoc": "docs/release/sibling-repos/FEDERATION_LADDER.md"
+  },
+  "truthBoundary": "This CCR publishes federation decision machinery and deny-by-default evaluation. It does not claim any live FederationGranted session until a valid handshake receipt is present and indexed.",
+  "traceabilityLinks": [
+    "docs/release/sibling-repos/FEDERATION_LADDER.md",
+    "docs/governance/ccr-aaes-os-sibling-adapter-contracts.md",
+    "docs/release/sibling-repos/CONNECTION_MAP.md"
+  ]
+}

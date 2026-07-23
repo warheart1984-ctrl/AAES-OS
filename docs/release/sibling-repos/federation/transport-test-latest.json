@@ -1,0 +1,15 @@
+{
+  "generatedAt": "2026-07-23T00:49:50.773Z",
+  "promoted": [
+    "opsConsole-SovereignX-v1"
+  ],
+  "failed": [],
+  "receipts": [
+    {
+      "transportId": "opsConsole-SovereignX-v1",
+      "testId": "tt-opsConsole-SovereignX-v1-70469d47",
+      "result": "pass",
+      "receiptHash": "sha256:84d37fd407db344e803f6486ff99c5275da5c5bb17ac0f55e4d0ed7d3df6b80d"
+    }
+  ]
+}

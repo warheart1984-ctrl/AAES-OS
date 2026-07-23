@@ -2,6 +2,12 @@ import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { buildExternalIntegrationEvidence, type ExternalIntegrationEvidenceIndex } from './external-integration-evidence.js';
+import {
+  buildSiblingRepoEvidenceInheritance,
+  ensureRuntimeFederationEvidence,
+  ensureSiblingAdapterContracts,
+  ensureSiblingRepoEvidence,
+} from '../release/sibling-evidence-inheritance.ts';
 
 interface SurfaceDefinition {
   id: string;
@@ -55,6 +61,9 @@ interface ProductionHardeningIndex {
   workspace: string;
   status: 'release-evidence-ready' | 'blocked';
   surfaces: SurfacePacket[];
+  siblingRepoMesh?: ReturnType<typeof buildSiblingRepoEvidenceInheritance>;
+  siblingAdapterContracts?: ReturnType<typeof ensureSiblingAdapterContracts>;
+  siblingRuntimeFederation?: ReturnType<typeof ensureRuntimeFederationEvidence>;
   aggregateHash: string;
 }
 
@@ -159,13 +168,33 @@ async function main(): Promise<void> {
   if (externalEvidence.status !== 'verified') {
     throw new Error(`external integration evidence blocked for: ${externalEvidence.observations.filter((observation) => observation.status === 'blocked').map((observation) => observation.id).join(', ')}`);
   }
+
+  // Sibling mesh is discovery evidence: refresh always, attach when present.
+  // Partial sibling status does NOT block runtime surface hardening (Drive-G-1).
+  const siblingEvidence = ensureSiblingRepoEvidence({ root, write: true });
+  const siblingAdapterContracts = ensureSiblingAdapterContracts({ root, write: true });
+  const siblingRuntimeFederation = ensureRuntimeFederationEvidence({ root, write: true });
+  const siblingRepoMesh = buildSiblingRepoEvidenceInheritance(
+    siblingEvidence,
+    siblingAdapterContracts,
+    siblingRuntimeFederation,
+  );
+
   const packets = surfaces.map((surface) => buildSurfacePacket(surface, externalEvidence));
-  const aggregateHash = hashJson(packets.map((packet) => ({ id: packet.id, status: packet.status, files: packet.releasePackagingPacket.includedFiles })));
+  const aggregateHash = hashJson({
+    surfaces: packets.map((packet) => ({ id: packet.id, status: packet.status, files: packet.releasePackagingPacket.includedFiles })),
+    siblingAggregateHash: siblingRepoMesh?.inheritedFields.siblingAggregateHash ?? null,
+    adapterAggregateHash: siblingAdapterContracts.aggregateHash,
+    runtimeFederationAggregateHash: siblingRuntimeFederation.aggregateHash,
+  });
   const index: ProductionHardeningIndex = {
     generatedAt: new Date().toISOString(),
-    workspace: 'E:/project-infi',
+    workspace: root.replace(/\\/g, '/'),
     status: packets.every((packet) => packet.status === 'release-evidence-ready') ? 'release-evidence-ready' : 'blocked',
     surfaces: packets,
+    siblingRepoMesh: siblingRepoMesh ?? undefined,
+    siblingAdapterContracts,
+    siblingRuntimeFederation,
     aggregateHash,
   };
 
@@ -181,6 +210,11 @@ async function main(): Promise<void> {
   }
 
   console.log(`production hardening evidence generated: ${packets.length} surfaces`);
+  console.log(`sibling mesh: ${siblingRepoMesh?.siblingAggregateStatus ?? 'absent'} (${siblingRepoMesh?.inheritedFields.siblingSummary.verified ?? 0} verified siblings)`);
+  console.log(`adapter contracts: ${siblingAdapterContracts.status} (${siblingAdapterContracts.summary.passed} pass / ${siblingAdapterContracts.summary.failed} fail)`);
+  console.log(
+    `runtime federation: ${siblingRuntimeFederation.implementationStatus} (grants=${siblingRuntimeFederation.summary.liveSessionsGranted}; promotion=${siblingRuntimeFederation.promotionConditionsMet})`,
+  );
   console.log(`aggregate hash: ${aggregateHash}`);
 }
 
@@ -262,6 +296,9 @@ function registryContainsLiveEntry(registryPath: string, registryId: string): bo
 }
 
 function writeMarkdownIndex(index: ProductionHardeningIndex): void {
+  const sibling = index.siblingRepoMesh;
+  const adapters = index.siblingAdapterContracts;
+  const federation = index.siblingRuntimeFederation;
   const lines = [
     '# Production Hardening Evidence',
     '',
@@ -277,7 +314,61 @@ function writeMarkdownIndex(index: ProductionHardeningIndex): void {
       return `| ${surface.packageName} | ${surface.status} | ${surface.replayAuditPacket.replayReference} | ${surface.releasePackagingPacket.manifestId} | ${surface.externalIntegrationPacket.readiness} |`;
     }),
     '',
-    'This generated index is evidence, not a production publication by itself. It records the replay/audit, release-packaging, and external-integration readiness packets for promoted live runtime surfaces.',
+    '## Sibling repo mesh (CCR-AAES-OS-SiblingRepoDiscovery)',
+    '',
+    sibling
+      ? [
+          `Status: \`${sibling.siblingAggregateStatus}\``,
+          '',
+          `Aggregate hash: \`${sibling.inheritedFields.siblingAggregateHash}\``,
+          '',
+          `Verified / partial / missing: ${sibling.inheritedFields.siblingSummary.verified} / ${sibling.inheritedFields.siblingSummary.partial} / ${sibling.inheritedFields.siblingSummary.missing}`,
+          '',
+          sibling.inheritedFields.canonicalLineage
+            ? `Canonical lineage (\`${sibling.inheritedFields.canonicalLineage.siblingId}\`): maturity observed \`${sibling.inheritedFields.canonicalLineage.observedMaturity ?? 'n/a'}\`; receipt ${sibling.inheritedFields.canonicalLineage.receiptPresent ? 'present' : 'absent'}.`
+            : 'Canonical lineage: not observed.',
+          '',
+          sibling.constitutionalGuarantee,
+        ].join('\n')
+      : 'Sibling mesh evidence not attached.',
+    '',
+    '## Sibling adapter contracts (CCR-AAES-OS-SiblingAdapterContracts)',
+    '',
+    adapters
+      ? [
+          `Status: \`${adapters.status}\` (fail-closed)`,
+          '',
+          `Aggregate hash: \`${adapters.aggregateHash}\``,
+          '',
+          `Passed / failed: ${adapters.summary.passed} / ${adapters.summary.failed}`,
+          '',
+          'Evidence: `docs/release/sibling-repos/adapters/adapter-contract-evidence-index.json`',
+          '',
+          'Checkout authority only — does not grant live mesh sessions.',
+        ].join('\n')
+      : 'Adapter contract evidence not attached.',
+    '',
+    '## Runtime federation (CCR-AAES-OS-RuntimeFederation)',
+    '',
+    federation
+      ? [
+          `Implementation status: \`${federation.implementationStatus}\` (fail-closed)`,
+          '',
+          `Promotion conditions met: \`${federation.promotionConditionsMet}\``,
+          '',
+          `Live sessions granted: ${federation.summary.liveSessionsGranted}`,
+          '',
+          `Transports declared / tested: ${federation.summary.transportsDeclared} / ${federation.summary.transportsTested}`,
+          '',
+          `Aggregate hash: \`${federation.aggregateHash}\``,
+          '',
+          'Evidence: `docs/release/sibling-repos/federation/handshake-receipt-evidence-index.json`',
+          '',
+          federation.truthBoundary,
+        ].join('\n')
+      : 'Runtime federation evidence not attached.',
+    '',
+    'This generated index is evidence, not a production publication by itself. It records the replay/audit, release-packaging, external-integration, sibling-discovery, adapter-contract, and runtime-federation readiness packets for promoted live runtime surfaces.',
     '',
   ];
 

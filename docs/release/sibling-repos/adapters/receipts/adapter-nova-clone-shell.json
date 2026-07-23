@@ -1,0 +1,49 @@
+{
+  "artifact": "sibling-adapter-contract-receipt",
+  "version": "0.1.0",
+  "adapterId": "adapter-nova-clone-shell",
+  "siblingId": "nova-clone",
+  "family": "nova",
+  "mode": "product-checkout",
+  "failClosed": true,
+  "verdict": "pass",
+  "checkedAt": "2026-07-23T02:43:47.470Z",
+  "evidenceHash": "90ce2c978ef2163be1d25ca2c3d39258f7579d713aa9e019efd982f4a9f71021",
+  "siblingEvidenceHash": "12760b8160c3ad2904885a6aff245403e1693a510285a99e8d9997806a711708",
+  "path": "G:/nova-clone",
+  "remoteUrl": "https://github.com/warheart1984-ctrl/agentic-coding-agent.git",
+  "headCommit": "bf940ccc28b982bdbf9345293ca04b7507814f4c",
+  "checks": [
+    {
+      "id": "sibling-discovery-verified",
+      "passed": true,
+      "detail": "sibling status=verified"
+    },
+    {
+      "id": "remote-match",
+      "passed": true,
+      "detail": "expected=https://github.com/warheart1984-ctrl/agentic-coding-agent.git; observed=https://github.com/warheart1984-ctrl/agentic-coding-agent.git"
+    },
+    {
+      "id": "required-artifacts",
+      "passed": true,
+      "detail": "present=README.md,package.json,src"
+    },
+    {
+      "id": "constitutional-receipt-present",
+      "passed": true,
+      "detail": "not required for this adapter mode"
+    }
+  ],
+  "blockers": [],
+  "knownLimitations": [
+    "Nova clone publishes no constitutional release receipt yet; adapter is checkout-contract only."
+  ],
+  "observedReceipt": {
+    "path": null,
+    "maturity": null,
+    "receiptHash": null,
+    "verificationDate": null
+  },
+  "truthBoundary": "Adapter contracts prove fail-closed local contract checks against verified sibling checkouts. They do not prove live RPC/federation or shared runtime authority."
+}

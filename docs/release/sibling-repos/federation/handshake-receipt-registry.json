@@ -1,0 +1,9 @@
+{
+  "registryId": "aaes-os-handshake-receipt-registry",
+  "version": "0.1.0",
+  "status": "Published",
+  "ccrId": "CCR-AAES-OS-RuntimeFederation",
+  "contractId": "CRC-AAES-OS-HandshakeReceipt",
+  "receipts": [],
+  "truthBoundary": "Indexed handshake receipts only. Empty registry means no live federation grants exist."
+}

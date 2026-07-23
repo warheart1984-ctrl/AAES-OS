@@ -1,0 +1,162 @@
+{
+  "registryId": "aaes-os-sibling-repo-registry",
+  "version": "0.1.0",
+  "status": "Published",
+  "generatedFor": "AAES-OS-clone",
+  "connectionLadder": [
+    "discovery-registry",
+    "local-evidence-probe",
+    "canonical-inheritance",
+    "adapter-contracts",
+    "runtime-federation"
+  ],
+  "ccrId": "CCR-AAES-OS-SiblingRepoDiscovery",
+  "truthBoundary": "This registry declares known sibling workspaces on Drive G for discovery and evidence probing. Presence of a path does not prove live federation, API connectivity, or shared runtime authority.",
+  "hub": {
+    "id": "aaes-os-clone",
+    "path": "G:/AAES-OS-clone",
+    "role": "hub",
+    "family": "aaes-os"
+  },
+  "siblings": [
+    {
+      "id": "aaes-os",
+      "path": "G:/aaes-os",
+      "family": "aaes-os",
+      "role": "sibling-checkout",
+      "expectedArtifacts": ["package.json", "README.md"]
+    },
+    {
+      "id": "project-infi",
+      "path": "G:/project-infi",
+      "family": "project-infinity",
+      "role": "canonical-mirror-source",
+      "expectedArtifacts": [
+        "docs/scorecards/project-infi.md",
+        "release/constitutional-release-receipt.json",
+        "package.json",
+        "README.md"
+      ],
+      "notes": "Drive-G-2 notes AAES-OS-clone as a non-canonical mirror of project-infi. Canonical lineage inheritance reads this checkout."
+    },
+    {
+      "id": "project-infinity-main",
+      "path": "G:/Project-Infinity-main",
+      "family": "project-infinity",
+      "role": "sibling-checkout",
+      "expectedArtifacts": ["README.md"]
+    },
+    {
+      "id": "mythar-core",
+      "path": "G:/mythar-core",
+      "family": "mythar",
+      "role": "sibling-product",
+      "expectedArtifacts": ["README.md"]
+    },
+    {
+      "id": "mythar-api",
+      "path": "G:/mythar-api",
+      "family": "mythar",
+      "role": "sibling-product",
+      "expectedArtifacts": ["README.md"]
+    },
+    {
+      "id": "mythar-registry",
+      "path": "G:/mythar-registry",
+      "family": "mythar",
+      "role": "sibling-product",
+      "expectedArtifacts": ["README.md"]
+    },
+    {
+      "id": "mythar-v0.2",
+      "path": "G:/mythar-v0.2",
+      "family": "mythar",
+      "role": "sibling-product",
+      "expectedArtifacts": ["README.md"]
+    },
+    {
+      "id": "nova-clone",
+      "path": "G:/nova-clone",
+      "family": "nova",
+      "role": "sibling-product",
+      "expectedArtifacts": ["README.md"]
+    },
+    {
+      "id": "nova-mission-002",
+      "path": "G:/nova-mission-002",
+      "family": "nova",
+      "role": "sibling-product",
+      "expectedArtifacts": ["README.md"]
+    },
+    {
+      "id": "ulx",
+      "path": "G:/ulx",
+      "family": "ulx",
+      "role": "sibling-product",
+      "expectedArtifacts": ["README.md"]
+    },
+    {
+      "id": "research-os",
+      "path": "G:/research-os",
+      "family": "research-os",
+      "role": "sibling-product",
+      "expectedArtifacts": ["README.md"]
+    },
+    {
+      "id": "ai-factory",
+      "path": "G:/ai_factory",
+      "family": "ai-factory",
+      "role": "sibling-product",
+      "expectedArtifacts": ["README.md"]
+    },
+    {
+      "id": "earth-os",
+      "path": "G:/Earth-OS",
+      "family": "earth-os",
+      "role": "sibling-product",
+      "expectedArtifacts": ["README.md"]
+    },
+    {
+      "id": "sovereign-reconstruction-engine",
+      "path": "G:/sovereign-reconstruction-engine",
+      "family": "sre",
+      "role": "sibling-product",
+      "expectedArtifacts": ["README.md"]
+    },
+    {
+      "id": "cih",
+      "path": "G:/CIH",
+      "family": "cih",
+      "role": "sibling-product",
+      "expectedArtifacts": ["README.md"]
+    },
+    {
+      "id": "ceip-temporal-standards",
+      "path": "G:/ceip-temporal-standards",
+      "family": "standards",
+      "role": "sibling-standards",
+      "expectedArtifacts": ["README.md"]
+    },
+    {
+      "id": "multi-agent-orchestrator",
+      "path": "G:/MultiAgentOrchestrator",
+      "family": "orchestrator",
+      "role": "sibling-product",
+      "expectedArtifacts": ["README.md"]
+    },
+    {
+      "id": "hydra",
+      "path": "G:/HYDRA",
+      "family": "hydra",
+      "role": "sibling-product",
+      "expectedArtifacts": ["README.md"]
+    },
+    {
+      "id": "fae",
+      "path": "G:/fae",
+      "family": "fae",
+      "role": "sibling-product",
+      "expectedArtifacts": ["README.md"]
+    }
+  ]
+}

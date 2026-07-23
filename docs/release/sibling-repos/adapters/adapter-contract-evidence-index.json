@@ -1,0 +1,420 @@
+{
+  "artifact": "sibling-adapter-contract-evidence-index",
+  "version": "0.1.0",
+  "generatedAt": "2026-07-23T02:43:47.470Z",
+  "workspace": "G:/AAES-OS-clone",
+  "registryPath": "G:/AAES-OS-clone/docs/release/sibling-repos/adapters/adapter-contract-registry.json",
+  "siblingEvidencePath": "G:/AAES-OS-clone/docs/release/sibling-repos/sibling-repo-evidence-index.json",
+  "siblingAggregateHash": "12760b8160c3ad2904885a6aff245403e1693a510285a99e8d9997806a711708",
+  "status": "verified",
+  "failClosed": true,
+  "summary": {
+    "declared": 8,
+    "passed": 8,
+    "failed": 0,
+    "deferredFamilies": 1
+  },
+  "receipts": [
+    {
+      "artifact": "sibling-adapter-contract-receipt",
+      "version": "0.1.0",
+      "adapterId": "adapter-project-infi-canonical",
+      "siblingId": "project-infi",
+      "family": "project-infinity",
+      "mode": "canonical-lineage",
+      "failClosed": true,
+      "verdict": "pass",
+      "checkedAt": "2026-07-23T02:43:47.470Z",
+      "evidenceHash": "30c312007126d0a314b06544ddfb39bc23f88fe793c5cf83aae9c6d77c8a8209",
+      "siblingEvidenceHash": "12760b8160c3ad2904885a6aff245403e1693a510285a99e8d9997806a711708",
+      "path": "G:/project-infi",
+      "remoteUrl": "https://github.com/warheart1984-ctrl/project-infi.git",
+      "headCommit": "246a97a7a7426578c00cd4c2ce6124b6ed40cf33",
+      "checks": [
+        {
+          "id": "sibling-discovery-verified",
+          "passed": true,
+          "detail": "sibling status=verified"
+        },
+        {
+          "id": "remote-match",
+          "passed": true,
+          "detail": "expected=https://github.com/warheart1984-ctrl/project-infi.git; observed=https://github.com/warheart1984-ctrl/project-infi.git"
+        },
+        {
+          "id": "required-artifacts",
+          "passed": true,
+          "detail": "present=README.md,package.json,docs/scorecards/project-infi.md,release/constitutional-release-receipt.json"
+        },
+        {
+          "id": "constitutional-receipt-present",
+          "passed": true,
+          "detail": "found release/constitutional-release-receipt.json"
+        },
+        {
+          "id": "receipt-maturity-field",
+          "passed": true,
+          "detail": "constitutionalMaturity=Verified Prototype"
+        },
+        {
+          "id": "receipt-hash-field",
+          "passed": true,
+          "detail": "receiptHash=sha256:d755dc1fb5cdbd521659192c91e34e2374d49dc0811c385152370af3a1b18ddb"
+        }
+      ],
+      "blockers": [],
+      "knownLimitations": [],
+      "observedReceipt": {
+        "path": "release/constitutional-release-receipt.json",
+        "maturity": "Verified Prototype",
+        "receiptHash": "sha256:d755dc1fb5cdbd521659192c91e34e2374d49dc0811c385152370af3a1b18ddb",
+        "verificationDate": "2026-07-14T16:52:26.145Z"
+      },
+      "truthBoundary": "Adapter contracts prove fail-closed local contract checks against verified sibling checkouts. They do not prove live RPC/federation or shared runtime authority."
+    },
+    {
+      "artifact": "sibling-adapter-contract-receipt",
+      "version": "0.1.0",
+      "adapterId": "adapter-nova-clone-shell",
+      "siblingId": "nova-clone",
+      "family": "nova",
+      "mode": "product-checkout",
+      "failClosed": true,
+      "verdict": "pass",
+      "checkedAt": "2026-07-23T02:43:47.470Z",
+      "evidenceHash": "90ce2c978ef2163be1d25ca2c3d39258f7579d713aa9e019efd982f4a9f71021",
+      "siblingEvidenceHash": "12760b8160c3ad2904885a6aff245403e1693a510285a99e8d9997806a711708",
+      "path": "G:/nova-clone",
+      "remoteUrl": "https://github.com/warheart1984-ctrl/agentic-coding-agent.git",
+      "headCommit": "bf940ccc28b982bdbf9345293ca04b7507814f4c",
+      "checks": [
+        {
+          "id": "sibling-discovery-verified",
+          "passed": true,
+          "detail": "sibling status=verified"
+        },
+        {
+          "id": "remote-match",
+          "passed": true,
+          "detail": "expected=https://github.com/warheart1984-ctrl/agentic-coding-agent.git; observed=https://github.com/warheart1984-ctrl/agentic-coding-agent.git"
+        },
+        {
+          "id": "required-artifacts",
+          "passed": true,
+          "detail": "present=README.md,package.json,src"
+        },
+        {
+          "id": "constitutional-receipt-present",
+          "passed": true,
+          "detail": "not required for this adapter mode"
+        }
+      ],
+      "blockers": [],
+      "knownLimitations": [
+        "Nova clone publishes no constitutional release receipt yet; adapter is checkout-contract only."
+      ],
+      "observedReceipt": {
+        "path": null,
+        "maturity": null,
+        "receiptHash": null,
+        "verificationDate": null
+      },
+      "truthBoundary": "Adapter contracts prove fail-closed local contract checks against verified sibling checkouts. They do not prove live RPC/federation or shared runtime authority."
+    },
+    {
+      "artifact": "sibling-adapter-contract-receipt",
+      "version": "0.1.0",
+      "adapterId": "adapter-earth-os",
+      "siblingId": "earth-os",
+      "family": "earth-os",
+      "mode": "product-checkout",
+      "failClosed": true,
+      "verdict": "pass",
+      "checkedAt": "2026-07-23T02:43:47.470Z",
+      "evidenceHash": "b9fdc8c78e46c3597dc5cf96124d0d64883d2ae773ed1d7760a5eaed9b53e4d6",
+      "siblingEvidenceHash": "12760b8160c3ad2904885a6aff245403e1693a510285a99e8d9997806a711708",
+      "path": "G:/Earth-OS",
+      "remoteUrl": "https://github.com/warheart1984-ctrl/Earth-OS.git",
+      "headCommit": "d803de76ab1b5b3fd0e5d5a771a929c1ae1defbe",
+      "checks": [
+        {
+          "id": "sibling-discovery-verified",
+          "passed": true,
+          "detail": "sibling status=verified"
+        },
+        {
+          "id": "remote-match",
+          "passed": true,
+          "detail": "expected=https://github.com/warheart1984-ctrl/Earth-OS.git; observed=https://github.com/warheart1984-ctrl/Earth-OS.git"
+        },
+        {
+          "id": "required-artifacts",
+          "passed": true,
+          "detail": "present=README.md,docs/scorecards"
+        },
+        {
+          "id": "constitutional-receipt-present",
+          "passed": true,
+          "detail": "not required for this adapter mode"
+        }
+      ],
+      "blockers": [],
+      "knownLimitations": [
+        "Earth-OS adapter is documentation/scorecard presence only; no shared runtime wire."
+      ],
+      "observedReceipt": {
+        "path": null,
+        "maturity": null,
+        "receiptHash": null,
+        "verificationDate": null
+      },
+      "truthBoundary": "Adapter contracts prove fail-closed local contract checks against verified sibling checkouts. They do not prove live RPC/federation or shared runtime authority."
+    },
+    {
+      "artifact": "sibling-adapter-contract-receipt",
+      "version": "0.1.0",
+      "adapterId": "adapter-sre",
+      "siblingId": "sovereign-reconstruction-engine",
+      "family": "sre",
+      "mode": "product-checkout",
+      "failClosed": true,
+      "verdict": "pass",
+      "checkedAt": "2026-07-23T02:43:47.470Z",
+      "evidenceHash": "85c24a9889796d4723c89fd868990bd6f3b6daa9c4efd9293aa4bd192fd1d55d",
+      "siblingEvidenceHash": "12760b8160c3ad2904885a6aff245403e1693a510285a99e8d9997806a711708",
+      "path": "G:/sovereign-reconstruction-engine",
+      "remoteUrl": "https://github.com/warheart1984-ctrl/SRE.git",
+      "headCommit": "fe55add2ef240f58ea8d7be28df2f88fa6d27935",
+      "checks": [
+        {
+          "id": "sibling-discovery-verified",
+          "passed": true,
+          "detail": "sibling status=verified"
+        },
+        {
+          "id": "remote-match",
+          "passed": true,
+          "detail": "expected=https://github.com/warheart1984-ctrl/SRE.git; observed=https://github.com/warheart1984-ctrl/SRE.git"
+        },
+        {
+          "id": "required-artifacts",
+          "passed": true,
+          "detail": "present=README.md,pyproject.toml,src"
+        },
+        {
+          "id": "constitutional-receipt-present",
+          "passed": true,
+          "detail": "not required for this adapter mode"
+        }
+      ],
+      "blockers": [],
+      "knownLimitations": [],
+      "observedReceipt": {
+        "path": null,
+        "maturity": null,
+        "receiptHash": null,
+        "verificationDate": null
+      },
+      "truthBoundary": "Adapter contracts prove fail-closed local contract checks against verified sibling checkouts. They do not prove live RPC/federation or shared runtime authority."
+    },
+    {
+      "artifact": "sibling-adapter-contract-receipt",
+      "version": "0.1.0",
+      "adapterId": "adapter-cih",
+      "siblingId": "cih",
+      "family": "cih",
+      "mode": "product-checkout",
+      "failClosed": true,
+      "verdict": "pass",
+      "checkedAt": "2026-07-23T02:43:47.470Z",
+      "evidenceHash": "0c8ad64af3d7d0a62e7dc2170c1ae734484615a359e7c848a982edb3545a7a7e",
+      "siblingEvidenceHash": "12760b8160c3ad2904885a6aff245403e1693a510285a99e8d9997806a711708",
+      "path": "G:/CIH",
+      "remoteUrl": "https://github.com/warheart1984-ctrl/CIH.git",
+      "headCommit": "45db0d07c766ac79b903f37e14175715aed06da9",
+      "checks": [
+        {
+          "id": "sibling-discovery-verified",
+          "passed": true,
+          "detail": "sibling status=verified"
+        },
+        {
+          "id": "remote-match",
+          "passed": true,
+          "detail": "expected=https://github.com/warheart1984-ctrl/CIH.git; observed=https://github.com/warheart1984-ctrl/CIH.git"
+        },
+        {
+          "id": "required-artifacts",
+          "passed": true,
+          "detail": "present=README.md,pyproject.toml"
+        },
+        {
+          "id": "constitutional-receipt-present",
+          "passed": true,
+          "detail": "not required for this adapter mode"
+        }
+      ],
+      "blockers": [],
+      "knownLimitations": [],
+      "observedReceipt": {
+        "path": null,
+        "maturity": null,
+        "receiptHash": null,
+        "verificationDate": null
+      },
+      "truthBoundary": "Adapter contracts prove fail-closed local contract checks against verified sibling checkouts. They do not prove live RPC/federation or shared runtime authority."
+    },
+    {
+      "artifact": "sibling-adapter-contract-receipt",
+      "version": "0.1.0",
+      "adapterId": "adapter-ceip-temporal-standards",
+      "siblingId": "ceip-temporal-standards",
+      "family": "standards",
+      "mode": "standards-checkout",
+      "failClosed": true,
+      "verdict": "pass",
+      "checkedAt": "2026-07-23T02:43:47.470Z",
+      "evidenceHash": "c317b1b06fdc9b3dfaa0cf2409f4430d682143ffddc22ef5d026c1882cabd8b6",
+      "siblingEvidenceHash": "12760b8160c3ad2904885a6aff245403e1693a510285a99e8d9997806a711708",
+      "path": "G:/ceip-temporal-standards",
+      "remoteUrl": "https://github.com/warheart1984-ctrl/ceip-temporal-standards.git",
+      "headCommit": "984245a5385bdeb068dc604ce468b7fd7ab706de",
+      "checks": [
+        {
+          "id": "sibling-discovery-verified",
+          "passed": true,
+          "detail": "sibling status=verified"
+        },
+        {
+          "id": "remote-match",
+          "passed": true,
+          "detail": "expected=https://github.com/warheart1984-ctrl/ceip-temporal-standards.git; observed=https://github.com/warheart1984-ctrl/ceip-temporal-standards.git"
+        },
+        {
+          "id": "required-artifacts",
+          "passed": true,
+          "detail": "present=README.md,pyproject.toml"
+        },
+        {
+          "id": "constitutional-receipt-present",
+          "passed": true,
+          "detail": "not required for this adapter mode"
+        }
+      ],
+      "blockers": [],
+      "knownLimitations": [],
+      "observedReceipt": {
+        "path": null,
+        "maturity": null,
+        "receiptHash": null,
+        "verificationDate": null
+      },
+      "truthBoundary": "Adapter contracts prove fail-closed local contract checks against verified sibling checkouts. They do not prove live RPC/federation or shared runtime authority."
+    },
+    {
+      "artifact": "sibling-adapter-contract-receipt",
+      "version": "0.1.0",
+      "adapterId": "adapter-hydra",
+      "siblingId": "hydra",
+      "family": "hydra",
+      "mode": "adjacent-checkout",
+      "failClosed": true,
+      "verdict": "pass",
+      "checkedAt": "2026-07-23T02:43:47.470Z",
+      "evidenceHash": "1cd7892d0884d252ab40e1434124311fab179cd7fc0b6ceac9cd69d7db4674c0",
+      "siblingEvidenceHash": "12760b8160c3ad2904885a6aff245403e1693a510285a99e8d9997806a711708",
+      "path": "G:/HYDRA",
+      "remoteUrl": "https://github.com/standardgalactic/HYDRA.git",
+      "headCommit": "606ad8cd6be889760cb664a697c453554d360aa0",
+      "checks": [
+        {
+          "id": "sibling-discovery-verified",
+          "passed": true,
+          "detail": "sibling status=verified"
+        },
+        {
+          "id": "remote-match",
+          "passed": true,
+          "detail": "expected=https://github.com/standardgalactic/HYDRA.git; observed=https://github.com/standardgalactic/HYDRA.git"
+        },
+        {
+          "id": "required-artifacts",
+          "passed": true,
+          "detail": "present=README.md,LICENSE"
+        },
+        {
+          "id": "constitutional-receipt-present",
+          "passed": true,
+          "detail": "not required for this adapter mode"
+        }
+      ],
+      "blockers": [],
+      "knownLimitations": [
+        "HYDRA remote is outside warheart1984-ctrl; treated as adjacent, not core AAES authority."
+      ],
+      "observedReceipt": {
+        "path": null,
+        "maturity": null,
+        "receiptHash": null,
+        "verificationDate": null
+      },
+      "truthBoundary": "Adapter contracts prove fail-closed local contract checks against verified sibling checkouts. They do not prove live RPC/federation or shared runtime authority."
+    },
+    {
+      "artifact": "sibling-adapter-contract-receipt",
+      "version": "0.1.0",
+      "adapterId": "adapter-fae",
+      "siblingId": "fae",
+      "family": "fae",
+      "mode": "product-checkout",
+      "failClosed": true,
+      "verdict": "pass",
+      "checkedAt": "2026-07-23T02:43:47.470Z",
+      "evidenceHash": "277b7d68dcb37ff18a3eb127e845eb1d8c3fe22c8967efdae3b2fcc4dbd44c34",
+      "siblingEvidenceHash": "12760b8160c3ad2904885a6aff245403e1693a510285a99e8d9997806a711708",
+      "path": "G:/fae",
+      "remoteUrl": "https://github.com/warheart1984-ctrl/FAE.git",
+      "headCommit": "6ffcaf26637ed48c03bfa5c59bf1080106a1560c",
+      "checks": [
+        {
+          "id": "sibling-discovery-verified",
+          "passed": true,
+          "detail": "sibling status=verified"
+        },
+        {
+          "id": "remote-match",
+          "passed": true,
+          "detail": "expected=https://github.com/warheart1984-ctrl/FAE.git; observed=https://github.com/warheart1984-ctrl/FAE.git"
+        },
+        {
+          "id": "required-artifacts",
+          "passed": true,
+          "detail": "present=README.md,pyproject.toml"
+        },
+        {
+          "id": "constitutional-receipt-present",
+          "passed": true,
+          "detail": "not required for this adapter mode"
+        }
+      ],
+      "blockers": [],
+      "knownLimitations": [],
+      "observedReceipt": {
+        "path": null,
+        "maturity": null,
+        "receiptHash": null,
+        "verificationDate": null
+      },
+      "truthBoundary": "Adapter contracts prove fail-closed local contract checks against verified sibling checkouts. They do not prove live RPC/federation or shared runtime authority."
+    }
+  ],
+  "deferredFamilies": [
+    {
+      "family": "mythar",
+      "reason": "Mythar checkouts are discovery-partial (no verified git remotes). Adapter contracts stay deferred until sibling evidence status is verified.",
+      "status": "deferred-fail-closed"
+    }
+  ],
+  "aggregateHash": "1589836c7f10530823bc9a1e965b75e5205246c6110d7a55394a73d4d52a1583",
+  "truthBoundary": "Adapter contracts prove fail-closed local contract checks against verified sibling checkouts. They do not prove live RPC/federation or shared runtime authority."
+}

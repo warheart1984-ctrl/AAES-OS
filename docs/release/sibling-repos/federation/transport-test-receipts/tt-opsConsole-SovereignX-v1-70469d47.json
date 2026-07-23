@@ -1,0 +1,51 @@
+{
+  "artifact": "transport-test-receipt",
+  "version": "0.1.0",
+  "transportId": "opsConsole-SovereignX-v1",
+  "testId": "tt-opsConsole-SovereignX-v1-70469d47",
+  "result": "pass",
+  "latencyBounds": {
+    "maxMs": 2000,
+    "observedMaxMs": 1
+  },
+  "errorProfile": [],
+  "issuedAt": "2026-07-23T00:49:50.773Z",
+  "tester": "npm-run-transports:test",
+  "checks": [
+    {
+      "id": "connectivity",
+      "passed": true,
+      "detail": "client=services/ops-console:present; server=packages/sovereignx-router:present",
+      "latencyMs": 1
+    },
+    {
+      "id": "auth",
+      "passed": true,
+      "detail": "authMode=workspace-local-control-plane"
+    },
+    {
+      "id": "handshake-simulation",
+      "passed": true,
+      "detail": "simulated handshake ok for protocol=ops-console-sovereignx-control-plane",
+      "latencyMs": 0
+    },
+    {
+      "id": "latency-bounds",
+      "passed": true,
+      "detail": "observedMaxMs=1; maxMs=2000",
+      "latencyMs": 1
+    },
+    {
+      "id": "error-handling",
+      "passed": true,
+      "detail": "error profile empty under simulated success path"
+    },
+    {
+      "id": "logging",
+      "passed": true,
+      "detail": "transport test receipt records checks, latency, and tester identity"
+    }
+  ],
+  "expectedHandshakeBehavior": "simulate-control-plane-handshake-ok",
+  "receiptHash": "sha256:84d37fd407db344e803f6486ff99c5275da5c5bb17ac0f55e4d0ed7d3df6b80d"
+}

@@ -1,0 +1,36 @@
+{
+  "ccrId": "CCR-AAES-OS-SiblingAdapterContracts",
+  "displayName": "AAES-OS Sibling Adapter Contracts",
+  "version": "1.0.0",
+  "status": "Published",
+  "condition": "adapter-contract-registry evaluated fail-closed against verified sibling discovery",
+  "evidenceSource": "docs/release/sibling-repos/adapters/adapter-contract-evidence-index.json",
+  "inheritedFields": [
+    "adapterAggregateHash",
+    "adapterPassFailCounts",
+    "perAdapterReceipts"
+  ],
+  "authority": {
+    "source": "sibling-adapter-contract-evidence-index",
+    "primary": "aggregateHash"
+  },
+  "propagation": [
+    "adapter-contract-evidence",
+    "production-hardening-index",
+    "scorecard",
+    "verification-lineage"
+  ],
+  "constitutionalGuarantee": "Adapter contract pass requires verified sibling discovery, matching git remote, required artifacts, and any declared receipt fields. Fail closed on missing evidence. Pass does not authorize runtime federation.",
+  "connectionLadderStep": "adapter-contracts",
+  "implementation": {
+    "registry": "docs/release/sibling-repos/adapters/adapter-contract-registry.json",
+    "probe": "tools/sibling-adapter-contracts.ts",
+    "receiptsDir": "docs/release/sibling-repos/adapters/receipts"
+  },
+  "truthBoundary": "Adapter contracts prove fail-closed local contract checks against verified sibling checkouts. They do not prove live RPC/federation or shared runtime authority.",
+  "traceabilityLinks": [
+    "docs/release/sibling-repos/CONNECTION_MAP.md",
+    "docs/governance/ccr-aaes-os-sibling-repo-discovery.md",
+    "docs/release/production-hardening/README.md"
+  ]
+}

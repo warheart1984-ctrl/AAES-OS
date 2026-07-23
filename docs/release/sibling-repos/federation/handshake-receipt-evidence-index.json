@@ -1,0 +1,218 @@
+{
+  "artifact": "handshake-receipt-evidence-index",
+  "version": "0.1.0",
+  "ccrId": "CCR-AAES-OS-RuntimeFederation",
+  "contractId": "CRC-AAES-OS-HandshakeReceipt",
+  "generatedAt": "2026-07-23T02:43:47.469Z",
+  "workspace": "G:/AAES-OS-clone",
+  "implementationStatus": "machinery-ready-live-grants-denied",
+  "failClosed": true,
+  "ladderStep": "runtime-federation",
+  "promotionConditionsMet": false,
+  "promotionChecklist": {
+    "version": "1.0.0",
+    "met": false,
+    "items": [
+      {
+        "id": "transport-tested-or-certified",
+        "required": true,
+        "met": true,
+        "detail": "eligible transports: opsConsole-SovereignX-v1(Tested)"
+      },
+      {
+        "id": "indexed-handshake-receipts",
+        "required": true,
+        "met": false,
+        "detail": "need ≥1 valid indexed receipt with receiptId, sessionId, remoteId, adapterId, transportId, issuedAt, expiresAt, receiptHash; valid=0 registryIndexed=0"
+      },
+      {
+        "id": "active-lineage-with-revocation-path",
+        "required": true,
+        "met": false,
+        "detail": "no Active lineage entry with sessionId/remoteId/adapterId/transportId/receiptId + revocationPath"
+      },
+      {
+        "id": "grant-events-not-pending-only",
+        "required": true,
+        "met": false,
+        "detail": "no grant (Active) events recorded yet"
+      }
+    ]
+  },
+  "summary": {
+    "transportsDeclared": 2,
+    "transportsTested": 1,
+    "transportsCertified": 0,
+    "adaptersVerified": 8,
+    "receiptsIndexed": 0,
+    "receiptsValid": 0,
+    "lineageActive": 0,
+    "lineageRevoked": 0,
+    "decisions": {
+      "NotEligible": 0,
+      "HandshakePending": 8,
+      "FederationDenied": 0,
+      "FederationGranted": 0
+    },
+    "liveSessionsGranted": 0
+  },
+  "transports": [
+    {
+      "transportId": "opsConsole-SovereignX-v1",
+      "version": "1.0.0",
+      "protocol": "ops-console-sovereignx-control-plane",
+      "path": "ops-console → SovereignX",
+      "endpoints": {
+        "client": "services/ops-console",
+        "server": "packages/sovereignx-router"
+      },
+      "authMode": "workspace-local-control-plane",
+      "maturity": "Tested",
+      "tested": true,
+      "lastTestReceiptId": "tt-opsConsole-SovereignX-v1-70469d47",
+      "notes": "Moves Declared → Tested only via `npm run transports:test` with a transport test receipt. Certified requires separate operational evidence.",
+      "status": "tested"
+    },
+    {
+      "transportId": "platformWeb-PlatformApi-v1",
+      "version": "1.0.0",
+      "protocol": "http-json",
+      "path": "platform-web → platform-api",
+      "endpoints": {
+        "client": "services/platform-web",
+        "server": "services/platform-api"
+      },
+      "authMode": "http-json-local",
+      "maturity": "Declared",
+      "tested": false,
+      "lastTestReceiptId": null,
+      "notes": "Intra-monorepo HTTP path. Same transport test gate applies."
+    }
+  ],
+  "decisions": [
+    {
+      "state": "HandshakePending",
+      "allowLiveSession": false,
+      "remoteId": "project-infi",
+      "adapterId": "adapter-project-infi-canonical",
+      "transportId": "opsConsole-SovereignX-v1",
+      "sessionId": null,
+      "receiptId": null,
+      "reasons": [
+        "Verified adapter and eligible transport present; handshake receipt absent (HandshakePending)"
+      ],
+      "checkedAt": "2026-07-23T02:43:47.469Z"
+    },
+    {
+      "state": "HandshakePending",
+      "allowLiveSession": false,
+      "remoteId": "nova-clone",
+      "adapterId": "adapter-nova-clone-shell",
+      "transportId": "opsConsole-SovereignX-v1",
+      "sessionId": null,
+      "receiptId": null,
+      "reasons": [
+        "Verified adapter and eligible transport present; handshake receipt absent (HandshakePending)"
+      ],
+      "checkedAt": "2026-07-23T02:43:47.469Z"
+    },
+    {
+      "state": "HandshakePending",
+      "allowLiveSession": false,
+      "remoteId": "earth-os",
+      "adapterId": "adapter-earth-os",
+      "transportId": "opsConsole-SovereignX-v1",
+      "sessionId": null,
+      "receiptId": null,
+      "reasons": [
+        "Verified adapter and eligible transport present; handshake receipt absent (HandshakePending)"
+      ],
+      "checkedAt": "2026-07-23T02:43:47.469Z"
+    },
+    {
+      "state": "HandshakePending",
+      "allowLiveSession": false,
+      "remoteId": "sovereign-reconstruction-engine",
+      "adapterId": "adapter-sre",
+      "transportId": "opsConsole-SovereignX-v1",
+      "sessionId": null,
+      "receiptId": null,
+      "reasons": [
+        "Verified adapter and eligible transport present; handshake receipt absent (HandshakePending)"
+      ],
+      "checkedAt": "2026-07-23T02:43:47.469Z"
+    },
+    {
+      "state": "HandshakePending",
+      "allowLiveSession": false,
+      "remoteId": "cih",
+      "adapterId": "adapter-cih",
+      "transportId": "opsConsole-SovereignX-v1",
+      "sessionId": null,
+      "receiptId": null,
+      "reasons": [
+        "Verified adapter and eligible transport present; handshake receipt absent (HandshakePending)"
+      ],
+      "checkedAt": "2026-07-23T02:43:47.469Z"
+    },
+    {
+      "state": "HandshakePending",
+      "allowLiveSession": false,
+      "remoteId": "ceip-temporal-standards",
+      "adapterId": "adapter-ceip-temporal-standards",
+      "transportId": "opsConsole-SovereignX-v1",
+      "sessionId": null,
+      "receiptId": null,
+      "reasons": [
+        "Verified adapter and eligible transport present; handshake receipt absent (HandshakePending)"
+      ],
+      "checkedAt": "2026-07-23T02:43:47.469Z"
+    },
+    {
+      "state": "HandshakePending",
+      "allowLiveSession": false,
+      "remoteId": "hydra",
+      "adapterId": "adapter-hydra",
+      "transportId": "opsConsole-SovereignX-v1",
+      "sessionId": null,
+      "receiptId": null,
+      "reasons": [
+        "Verified adapter and eligible transport present; handshake receipt absent (HandshakePending)"
+      ],
+      "checkedAt": "2026-07-23T02:43:47.469Z"
+    },
+    {
+      "state": "HandshakePending",
+      "allowLiveSession": false,
+      "remoteId": "fae",
+      "adapterId": "adapter-fae",
+      "transportId": "opsConsole-SovereignX-v1",
+      "sessionId": null,
+      "receiptId": null,
+      "reasons": [
+        "Verified adapter and eligible transport present; handshake receipt absent (HandshakePending)"
+      ],
+      "checkedAt": "2026-07-23T02:43:47.469Z"
+    }
+  ],
+  "receipts": [],
+  "sessionLineage": {
+    "artifact": "session-lineage-log",
+    "version": "0.1.0",
+    "ccrId": "CCR-AAES-OS-RuntimeFederation",
+    "generatedAt": "2026-07-23T02:43:47.469Z",
+    "entries": [],
+    "aggregateHash": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "truthBoundary": "Append-only session lineage. Empty log means no federation sessions have been requested or granted."
+  },
+  "lineage": {
+    "artifact": "federation-lineage-log",
+    "version": "0.1.0",
+    "ccrId": "CCR-AAES-OS-RuntimeFederation",
+    "generatedAt": "2026-07-23T02:43:47.469Z",
+    "entries": [],
+    "truthBoundary": "Append-only session lineage. Empty log means no federation sessions have been requested or granted."
+  },
+  "aggregateHash": "sha256:55e96944270d5a7b3dc31d4d3185a90a0c403d9f305a5bd6bbef59af2eff7f9e",
+  "truthBoundary": "Runtime federation evaluates live mesh authority fail-closed. Verified adapters prove checkout authority only. FederationGranted requires a valid handshake receipt under CRC-AAES-OS-HandshakeReceipt against a Tested (trial) or Certified (production) transport."
+}

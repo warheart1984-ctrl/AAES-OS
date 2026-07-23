@@ -1,0 +1,140 @@
+{
+  "registryId": "aaes-os-sibling-adapter-contracts",
+  "version": "0.1.0",
+  "status": "Published",
+  "ccrId": "CCR-AAES-OS-SiblingAdapterContracts",
+  "failClosedDefault": true,
+  "truthBoundary": "Adapter contracts prove fail-closed local contract checks against verified sibling checkouts. They do not prove live RPC/federation or shared runtime authority.",
+  "connectionLadderStep": "adapter-contracts",
+  "prerequisite": {
+    "evidenceSource": "docs/release/sibling-repos/sibling-repo-evidence-index.json",
+    "requiresSiblingStatus": "verified"
+  },
+  "adapters": [
+    {
+      "adapterId": "adapter-project-infi-canonical",
+      "siblingId": "project-infi",
+      "family": "project-infinity",
+      "mode": "canonical-lineage",
+      "expectedRemote": "https://github.com/warheart1984-ctrl/project-infi.git",
+      "requiredArtifacts": [
+        "README.md",
+        "package.json",
+        "docs/scorecards/project-infi.md",
+        "release/constitutional-release-receipt.json"
+      ],
+      "receiptRequirements": {
+        "constitutionalReceiptPath": "release/constitutional-release-receipt.json",
+        "requireReceiptHash": true,
+        "requireMaturityField": true
+      }
+    },
+    {
+      "adapterId": "adapter-nova-clone-shell",
+      "siblingId": "nova-clone",
+      "family": "nova",
+      "mode": "product-checkout",
+      "expectedRemote": "https://github.com/warheart1984-ctrl/agentic-coding-agent.git",
+      "requiredArtifacts": ["README.md", "package.json", "src"],
+      "receiptRequirements": {
+        "constitutionalReceiptPath": null,
+        "requireReceiptHash": false,
+        "requireMaturityField": false
+      },
+      "knownLimitations": [
+        "Nova clone publishes no constitutional release receipt yet; adapter is checkout-contract only."
+      ]
+    },
+    {
+      "adapterId": "adapter-earth-os",
+      "siblingId": "earth-os",
+      "family": "earth-os",
+      "mode": "product-checkout",
+      "expectedRemote": "https://github.com/warheart1984-ctrl/Earth-OS.git",
+      "requiredArtifacts": ["README.md", "docs/scorecards"],
+      "receiptRequirements": {
+        "constitutionalReceiptPath": null,
+        "requireReceiptHash": false,
+        "requireMaturityField": false
+      },
+      "knownLimitations": [
+        "Earth-OS adapter is documentation/scorecard presence only; no shared runtime wire."
+      ]
+    },
+    {
+      "adapterId": "adapter-sre",
+      "siblingId": "sovereign-reconstruction-engine",
+      "family": "sre",
+      "mode": "product-checkout",
+      "expectedRemote": "https://github.com/warheart1984-ctrl/SRE.git",
+      "requiredArtifacts": ["README.md", "pyproject.toml", "src"],
+      "receiptRequirements": {
+        "constitutionalReceiptPath": null,
+        "requireReceiptHash": false,
+        "requireMaturityField": false
+      }
+    },
+    {
+      "adapterId": "adapter-cih",
+      "siblingId": "cih",
+      "family": "cih",
+      "mode": "product-checkout",
+      "expectedRemote": "https://github.com/warheart1984-ctrl/CIH.git",
+      "requiredArtifacts": ["README.md", "pyproject.toml"],
+      "receiptRequirements": {
+        "constitutionalReceiptPath": null,
+        "requireReceiptHash": false,
+        "requireMaturityField": false
+      }
+    },
+    {
+      "adapterId": "adapter-ceip-temporal-standards",
+      "siblingId": "ceip-temporal-standards",
+      "family": "standards",
+      "mode": "standards-checkout",
+      "expectedRemote": "https://github.com/warheart1984-ctrl/ceip-temporal-standards.git",
+      "requiredArtifacts": ["README.md", "pyproject.toml"],
+      "receiptRequirements": {
+        "constitutionalReceiptPath": null,
+        "requireReceiptHash": false,
+        "requireMaturityField": false
+      }
+    },
+    {
+      "adapterId": "adapter-hydra",
+      "siblingId": "hydra",
+      "family": "hydra",
+      "mode": "adjacent-checkout",
+      "expectedRemote": "https://github.com/standardgalactic/HYDRA.git",
+      "requiredArtifacts": ["README.md", "LICENSE"],
+      "receiptRequirements": {
+        "constitutionalReceiptPath": null,
+        "requireReceiptHash": false,
+        "requireMaturityField": false
+      },
+      "knownLimitations": [
+        "HYDRA remote is outside warheart1984-ctrl; treated as adjacent, not core AAES authority."
+      ]
+    },
+    {
+      "adapterId": "adapter-fae",
+      "siblingId": "fae",
+      "family": "fae",
+      "mode": "product-checkout",
+      "expectedRemote": "https://github.com/warheart1984-ctrl/FAE.git",
+      "requiredArtifacts": ["README.md", "pyproject.toml"],
+      "receiptRequirements": {
+        "constitutionalReceiptPath": null,
+        "requireReceiptHash": false,
+        "requireMaturityField": false
+      }
+    }
+  ],
+  "deferredFamilies": [
+    {
+      "family": "mythar",
+      "reason": "Mythar checkouts are discovery-partial (no verified git remotes). Adapter contracts stay deferred until sibling evidence status is verified.",
+      "status": "deferred-fail-closed"
+    }
+  ]
+}

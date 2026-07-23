@@ -1,0 +1,428 @@
+{
+  "artifact": "sibling-repo-evidence-index",
+  "version": "0.1.0",
+  "generatedAt": "2026-07-23T02:43:47.471Z",
+  "workspace": "G:/AAES-OS-clone",
+  "registryPath": "G:/AAES-OS-clone/docs/release/sibling-repos/sibling-repo-registry.json",
+  "status": "partial",
+  "observations": [
+    {
+      "id": "aaes-os",
+      "family": "aaes-os",
+      "role": "sibling-checkout",
+      "path": "G:/aaes-os",
+      "status": "partial",
+      "checkedAt": "2026-07-23T02:43:47.471Z",
+      "evidenceHash": "a42374c95def274951e7a6af42df35654751c23f8589a042e87a6113e3b77fe0",
+      "observed": {
+        "exists": true,
+        "isGitRepo": false,
+        "remoteUrl": null,
+        "headCommit": null,
+        "artifactsPresent": [],
+        "artifactsMissing": [
+          "package.json",
+          "README.md"
+        ]
+      },
+      "blockers": [
+        "missing artifacts: package.json, README.md"
+      ]
+    },
+    {
+      "id": "project-infi",
+      "family": "project-infinity",
+      "role": "canonical-mirror-source",
+      "path": "G:/project-infi",
+      "status": "verified",
+      "checkedAt": "2026-07-23T02:43:47.471Z",
+      "evidenceHash": "601fb04a725c33b239e482d84a8d3a429de9528a0470ad5ad780377b6037d0cf",
+      "observed": {
+        "exists": true,
+        "isGitRepo": true,
+        "remoteUrl": "https://github.com/warheart1984-ctrl/project-infi.git",
+        "headCommit": "246a97a7a7426578c00cd4c2ce6124b6ed40cf33",
+        "artifactsPresent": [
+          "docs/scorecards/project-infi.md",
+          "release/constitutional-release-receipt.json",
+          "package.json",
+          "README.md"
+        ],
+        "artifactsMissing": []
+      },
+      "blockers": []
+    },
+    {
+      "id": "project-infinity-main",
+      "family": "project-infinity",
+      "role": "sibling-checkout",
+      "path": "G:/Project-Infinity-main",
+      "status": "partial",
+      "checkedAt": "2026-07-23T02:43:47.471Z",
+      "evidenceHash": "1380ecaf035ae8978fb048ae85d5bb55922c0b3e57a939eaeb8af73ec6a64913",
+      "observed": {
+        "exists": true,
+        "isGitRepo": false,
+        "remoteUrl": null,
+        "headCommit": null,
+        "artifactsPresent": [],
+        "artifactsMissing": [
+          "README.md"
+        ]
+      },
+      "blockers": [
+        "missing artifacts: README.md"
+      ]
+    },
+    {
+      "id": "mythar-core",
+      "family": "mythar",
+      "role": "sibling-product",
+      "path": "G:/mythar-core",
+      "status": "partial",
+      "checkedAt": "2026-07-23T02:43:47.471Z",
+      "evidenceHash": "9c41bdb349a266b6b18e828b4bd37f9274a4348d8312469abb220d5a5979e82f",
+      "observed": {
+        "exists": true,
+        "isGitRepo": false,
+        "remoteUrl": null,
+        "headCommit": null,
+        "artifactsPresent": [
+          "README.md"
+        ],
+        "artifactsMissing": []
+      },
+      "blockers": []
+    },
+    {
+      "id": "mythar-api",
+      "family": "mythar",
+      "role": "sibling-product",
+      "path": "G:/mythar-api",
+      "status": "partial",
+      "checkedAt": "2026-07-23T02:43:47.471Z",
+      "evidenceHash": "18adeeb0626ec8d45f5e207b0dbdb7918bc3c3896bac1949ce60cbff2cfe7191",
+      "observed": {
+        "exists": true,
+        "isGitRepo": false,
+        "remoteUrl": null,
+        "headCommit": null,
+        "artifactsPresent": [
+          "README.md"
+        ],
+        "artifactsMissing": []
+      },
+      "blockers": []
+    },
+    {
+      "id": "mythar-registry",
+      "family": "mythar",
+      "role": "sibling-product",
+      "path": "G:/mythar-registry",
+      "status": "partial",
+      "checkedAt": "2026-07-23T02:43:47.471Z",
+      "evidenceHash": "0406de6c113fe7829f3bd747262cabfa45bb43c1c95512930a2cae3aafb2c89b",
+      "observed": {
+        "exists": true,
+        "isGitRepo": false,
+        "remoteUrl": null,
+        "headCommit": null,
+        "artifactsPresent": [
+          "README.md"
+        ],
+        "artifactsMissing": []
+      },
+      "blockers": []
+    },
+    {
+      "id": "mythar-v0.2",
+      "family": "mythar",
+      "role": "sibling-product",
+      "path": "G:/mythar-v0.2",
+      "status": "partial",
+      "checkedAt": "2026-07-23T02:43:47.471Z",
+      "evidenceHash": "45d860cc9cd4557556613961df4b0b0f5ff08b2f834121e5fe5305fe14524bec",
+      "observed": {
+        "exists": true,
+        "isGitRepo": false,
+        "remoteUrl": null,
+        "headCommit": null,
+        "artifactsPresent": [
+          "README.md"
+        ],
+        "artifactsMissing": []
+      },
+      "blockers": []
+    },
+    {
+      "id": "nova-clone",
+      "family": "nova",
+      "role": "sibling-product",
+      "path": "G:/nova-clone",
+      "status": "verified",
+      "checkedAt": "2026-07-23T02:43:47.471Z",
+      "evidenceHash": "5274ab943ced01697ebf5d0ac708ff97ec70561b8c8d1b59768b4e37d310033f",
+      "observed": {
+        "exists": true,
+        "isGitRepo": true,
+        "remoteUrl": "https://github.com/warheart1984-ctrl/agentic-coding-agent.git",
+        "headCommit": "bf940ccc28b982bdbf9345293ca04b7507814f4c",
+        "artifactsPresent": [
+          "README.md"
+        ],
+        "artifactsMissing": []
+      },
+      "blockers": []
+    },
+    {
+      "id": "nova-mission-002",
+      "family": "nova",
+      "role": "sibling-product",
+      "path": "G:/nova-mission-002",
+      "status": "partial",
+      "checkedAt": "2026-07-23T02:43:47.471Z",
+      "evidenceHash": "8635e471dfeb3ddf724048b3db375df93d38fd5ecf786580c7edecb478e6ff28",
+      "observed": {
+        "exists": true,
+        "isGitRepo": false,
+        "remoteUrl": null,
+        "headCommit": null,
+        "artifactsPresent": [
+          "README.md"
+        ],
+        "artifactsMissing": []
+      },
+      "blockers": []
+    },
+    {
+      "id": "ulx",
+      "family": "ulx",
+      "role": "sibling-product",
+      "path": "G:/ulx",
+      "status": "partial",
+      "checkedAt": "2026-07-23T02:43:47.471Z",
+      "evidenceHash": "08481a3ca04cf3989ad9ce79afb11d1e4d7e74472ee54731d230560743666307",
+      "observed": {
+        "exists": true,
+        "isGitRepo": true,
+        "remoteUrl": null,
+        "headCommit": null,
+        "artifactsPresent": [],
+        "artifactsMissing": [
+          "README.md"
+        ]
+      },
+      "blockers": [
+        "missing artifacts: README.md"
+      ]
+    },
+    {
+      "id": "research-os",
+      "family": "research-os",
+      "role": "sibling-product",
+      "path": "G:/research-os",
+      "status": "partial",
+      "checkedAt": "2026-07-23T02:43:47.471Z",
+      "evidenceHash": "d386659e5ee7be1f89322783579f11295bf28cb3fb802c5367a298b1825e6175",
+      "observed": {
+        "exists": true,
+        "isGitRepo": false,
+        "remoteUrl": null,
+        "headCommit": null,
+        "artifactsPresent": [],
+        "artifactsMissing": [
+          "README.md"
+        ]
+      },
+      "blockers": [
+        "missing artifacts: README.md"
+      ]
+    },
+    {
+      "id": "ai-factory",
+      "family": "ai-factory",
+      "role": "sibling-product",
+      "path": "G:/ai_factory",
+      "status": "partial",
+      "checkedAt": "2026-07-23T02:43:47.471Z",
+      "evidenceHash": "d1143a873bb11d9cded1fd861060b291929bd61240ebf4378e739b53eb929c67",
+      "observed": {
+        "exists": true,
+        "isGitRepo": false,
+        "remoteUrl": null,
+        "headCommit": null,
+        "artifactsPresent": [],
+        "artifactsMissing": [
+          "README.md"
+        ]
+      },
+      "blockers": [
+        "missing artifacts: README.md"
+      ]
+    },
+    {
+      "id": "earth-os",
+      "family": "earth-os",
+      "role": "sibling-product",
+      "path": "G:/Earth-OS",
+      "status": "verified",
+      "checkedAt": "2026-07-23T02:43:47.471Z",
+      "evidenceHash": "8fe926a7135b3dd137f284bbb6551fda427b646cbb921372e0e0401823c27a53",
+      "observed": {
+        "exists": true,
+        "isGitRepo": true,
+        "remoteUrl": "https://github.com/warheart1984-ctrl/Earth-OS.git",
+        "headCommit": "d803de76ab1b5b3fd0e5d5a771a929c1ae1defbe",
+        "artifactsPresent": [
+          "README.md"
+        ],
+        "artifactsMissing": []
+      },
+      "blockers": []
+    },
+    {
+      "id": "sovereign-reconstruction-engine",
+      "family": "sre",
+      "role": "sibling-product",
+      "path": "G:/sovereign-reconstruction-engine",
+      "status": "verified",
+      "checkedAt": "2026-07-23T02:43:47.471Z",
+      "evidenceHash": "3edf24de4002b5b57ae5b66867ef201fc6809094ad575a94567f5adbb8f1f414",
+      "observed": {
+        "exists": true,
+        "isGitRepo": true,
+        "remoteUrl": "https://github.com/warheart1984-ctrl/SRE.git",
+        "headCommit": "fe55add2ef240f58ea8d7be28df2f88fa6d27935",
+        "artifactsPresent": [
+          "README.md"
+        ],
+        "artifactsMissing": []
+      },
+      "blockers": []
+    },
+    {
+      "id": "cih",
+      "family": "cih",
+      "role": "sibling-product",
+      "path": "G:/CIH",
+      "status": "verified",
+      "checkedAt": "2026-07-23T02:43:47.471Z",
+      "evidenceHash": "dc9d3264a4ff7eb21a800b7b683dd16c16318c9635158a27d3c9cd8fbdebdb57",
+      "observed": {
+        "exists": true,
+        "isGitRepo": true,
+        "remoteUrl": "https://github.com/warheart1984-ctrl/CIH.git",
+        "headCommit": "45db0d07c766ac79b903f37e14175715aed06da9",
+        "artifactsPresent": [
+          "README.md"
+        ],
+        "artifactsMissing": []
+      },
+      "blockers": []
+    },
+    {
+      "id": "ceip-temporal-standards",
+      "family": "standards",
+      "role": "sibling-standards",
+      "path": "G:/ceip-temporal-standards",
+      "status": "verified",
+      "checkedAt": "2026-07-23T02:43:47.471Z",
+      "evidenceHash": "f3bf8890acbd457688bf9d3615d9b8d63e14b83453d44ecc40e262c5f040f190",
+      "observed": {
+        "exists": true,
+        "isGitRepo": true,
+        "remoteUrl": "https://github.com/warheart1984-ctrl/ceip-temporal-standards.git",
+        "headCommit": "984245a5385bdeb068dc604ce468b7fd7ab706de",
+        "artifactsPresent": [
+          "README.md"
+        ],
+        "artifactsMissing": []
+      },
+      "blockers": []
+    },
+    {
+      "id": "multi-agent-orchestrator",
+      "family": "orchestrator",
+      "role": "sibling-product",
+      "path": "G:/MultiAgentOrchestrator",
+      "status": "partial",
+      "checkedAt": "2026-07-23T02:43:47.471Z",
+      "evidenceHash": "13e617564edb32a8c9d4d515a22583b4fae550f628a30df991012bf946bec807",
+      "observed": {
+        "exists": true,
+        "isGitRepo": false,
+        "remoteUrl": null,
+        "headCommit": null,
+        "artifactsPresent": [
+          "README.md"
+        ],
+        "artifactsMissing": []
+      },
+      "blockers": []
+    },
+    {
+      "id": "hydra",
+      "family": "hydra",
+      "role": "sibling-product",
+      "path": "G:/HYDRA",
+      "status": "verified",
+      "checkedAt": "2026-07-23T02:43:47.471Z",
+      "evidenceHash": "bffeeb1dc946ddb522271f9fb012bf1835224bca90102f0ed77cd37b893bab83",
+      "observed": {
+        "exists": true,
+        "isGitRepo": true,
+        "remoteUrl": "https://github.com/standardgalactic/HYDRA.git",
+        "headCommit": "606ad8cd6be889760cb664a697c453554d360aa0",
+        "artifactsPresent": [
+          "README.md"
+        ],
+        "artifactsMissing": []
+      },
+      "blockers": []
+    },
+    {
+      "id": "fae",
+      "family": "fae",
+      "role": "sibling-product",
+      "path": "G:/fae",
+      "status": "verified",
+      "checkedAt": "2026-07-23T02:43:47.471Z",
+      "evidenceHash": "c47494ad9a3162d46968c611b0a83ded4834ed76b45ad0f74aaea655ff973a7a",
+      "observed": {
+        "exists": true,
+        "isGitRepo": true,
+        "remoteUrl": "https://github.com/warheart1984-ctrl/FAE.git",
+        "headCommit": "6ffcaf26637ed48c03bfa5c59bf1080106a1560c",
+        "artifactsPresent": [
+          "README.md"
+        ],
+        "artifactsMissing": []
+      },
+      "blockers": []
+    }
+  ],
+  "summary": {
+    "declared": 19,
+    "verified": 8,
+    "partial": 11,
+    "missing": 0,
+    "families": [
+      "aaes-os",
+      "ai-factory",
+      "cih",
+      "earth-os",
+      "fae",
+      "hydra",
+      "mythar",
+      "nova",
+      "orchestrator",
+      "project-infinity",
+      "research-os",
+      "sre",
+      "standards",
+      "ulx"
+    ]
+  },
+  "aggregateHash": "12760b8160c3ad2904885a6aff245403e1693a510285a99e8d9997806a711708",
+  "truthBoundary": "This index records local sibling-checkout discovery and optional git remotes. It does not prove live federation, shared runtime authority, or API connectivity between repos."
+}
